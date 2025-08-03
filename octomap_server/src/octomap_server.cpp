@@ -37,6 +37,19 @@
 #include <tf2_eigen/tf2_eigen.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
+#include <pcl/common/common.h>
+
+
+// Arreglar
+// #include "/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/mixedoctree/include/PointCloudConverter.hpp"
+#include "octomap_server/PointCloudConverter.hpp"
+// #include "/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/mixedoctree/include/Point3D.h"
+#include "mesher_roi/Point3D.h"
+#include <mesher_roi/Mesher.h>
+
+//Guardar archivo vtk
+#include <pcl/io/pcd_io.h>
+
 namespace
 {
 template<typename T>
@@ -402,6 +415,63 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
   //
   PCLPointCloud pc;  // input cloud for filtering and ground-detection
   pcl::fromROSMsg(*cloud, pc);
+  
+  //----------------
+  // Pruebas Point3D
+  // for (PCLPointCloud::const_iterator it = pc.begin(); it != pc.end(); ++it) {
+    //   RCLCPP_INFO(this->get_logger(), "Punto: x=%.2f, y=%.2f, z=%.2f", it->x, it->y, it->z);
+    //   // octomap::point3d point(it->x, it->y, it->z);
+    // }
+    
+    std::vector<Clobscode::Point3D> Point3DCloud;
+    Point3DCloud = PointCloudConverter::toPoint3D(pc);
+
+
+    // Bounding Box de nube de puntos para integracion con mesher_roi.
+    PCLPoint minPt, maxPt;
+    pcl::getMinMax3D(pc, minPt, maxPt);
+    std::vector<double> bounds = {
+      minPt.x, minPt.y, minPt.z,
+      maxPt.x, maxPt.y, maxPt.z
+    };
+    Clobscode::Mesher mesher;
+    list<Clobscode::RefinementRegion *> rr;
+    RCLCPP_INFO(this->get_logger(), "\nBounds:\n\tminPt:\t(%.2f, %.2f, %.2f)\n\tmaxPt:\t(%.2f, %.2f, %.2f)", minPt.x, minPt.y, minPt.z, maxPt.x, maxPt.y, maxPt.z);
+
+    Clobscode::FEMesh outputMesh = mesher.generateMesh(Point3DCloud, 16, "test", rr, bounds);
+    Services::WriteVTK("octree",outputMesh);
+    //pcl::io::savePCDFileBinary("snapshot.pcd", cloud);
+    
+  // Comparar tamaños
+  //RCLCPP_INFO(this->get_logger(), "# PCLPointCloud: %lu\n# Point3D: %lu", pc.size(), Point3DCloud.size());
+
+  // Comparar puntos individuales
+  for (size_t i = 0; i < pc.size(); ++i) {
+    const auto& pcl_point = pc[i];
+    const auto& point3d_point = Point3DCloud[i];
+    if (std::abs(pcl_point.x - point3d_point.X()) > 1e-6 ||
+        std::abs(pcl_point.y - point3d_point.Y()) > 1e-6 ||
+        std::abs(pcl_point.z - point3d_point.Z()) > 1e-6)
+    {
+      //RCLCPP_INFO(this->get_logger(), "\nMismatch: True\n# PCLPointCloud:\t(%.2f, %.2f, %.2f)\n# Point3D:\t(%.2f, %.2f, %.2f)", pcl_point.x, pcl_point.y, pcl_point.z, point3d_point.X(), point3d_point.Y(), point3d_point.Z());
+    } else {
+      //RCLCPP_INFO(this->get_logger(), "\nMismatch: False\n# PCLPointCloud:\t(%.2f, %.2f, %.2f)\n# Point3D:\t(%.2f, %.2f, %.2f)", pcl_point.x, pcl_point.y, pcl_point.z, point3d_point.X(), point3d_point.Y(), point3d_point.Z());
+    }
+  }
+
+  // Tree Depth
+  // RCLCPP_INFO(this->get_logger(), "\nTree Depth: %lu\nMax Tree Depth: %lu", tree_depth_, max_tree_depth_);
+
+
+
+  // for (const auto& it : Point3DCloud) {
+  //   RCLCPP_INFO(this->get_logger(), "Point3D: x=%.2f, y=%.2f, z=%.2f", it.X(), it.Y(), it.Z());
+  // }
+  //----------------
+
+
+
+
 
   geometry_msgs::msg::TransformStamped sensor_to_world_transform_stamped;
   try {

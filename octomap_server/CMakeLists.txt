@@ -36,8 +36,19 @@ rclcpp_components_register_node(octomap_server_static
   EXECUTABLE octomap_server_static_node
 )
 
+
+
+# custom octomap_server----------------------------
 ament_auto_add_library(octomap_server SHARED
   src/octomap_server.cpp
+  # ../mixedoctree/src/Point3D.cpp
+)
+
+target_include_directories(octomap_server
+  PUBLIC
+    ${OCTOMAP_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../mixedoctree/include
 )
 
 target_link_libraries(octomap_server
@@ -45,10 +56,23 @@ target_link_libraries(octomap_server
   ${PCL_LIBRARIES}
 )
 
+# Mesher-----------------
+find_package(mesher_roi REQUIRED)
+
+# target_link_libraries(octomap_server
+#   mesher_roi::mesher_roi
+# )
+ament_target_dependencies(octomap_server
+  mesher_roi
+)
+#------------------------
+
 rclcpp_components_register_node(octomap_server
   PLUGIN "octomap_server::OctomapServer"
-  EXECUTABLE octomap_server_node
+  EXECUTABLE custom_octomap_server_node
 )
+
+#--------------------------------------------
 
 ament_auto_add_library(octomap_server_multilayer SHARED
   src/octomap_server.cpp
