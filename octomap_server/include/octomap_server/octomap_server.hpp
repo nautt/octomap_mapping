@@ -90,6 +90,11 @@ using sensor_msgs::msg::PointCloud2;
 using std_msgs::msg::ColorRGBA;
 using visualization_msgs::msg::MarkerArray;
 
+enum class OctreeBuilderMode {
+  OCTOMAP_NATIVE,
+  MESHER_EXTERNAL
+};
+
 class OctomapServer : public rclcpp::Node
 {
 public:
@@ -307,6 +312,26 @@ protected:
   unsigned multires_2d_scale_;
   bool project_complete_map_;
   bool use_colored_map_;
+
+private:
+  //std::mutex cloud_mutex_;
+  std::string mode;
+  OctreeBuilderMode octree_builder_mode_;
+  sensor_msgs::msg::PointCloud2 latest_cloud_;
+  rclcpp::Time latest_cloud_stamp_;
+  bool has_latest_pointcloud_;
+
+  // Servicio para triggerear la construccion del mapa con mesher.
+  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr build_map_srv_;
+
+  // Metodos para el mesher externo.
+  bool buildExternalOctree(
+    const std::shared_ptr<std_srvs::srv::Empty::Request>,
+    const std::shared_ptr<std_srvs::srv::Empty::Response>
+  );
+
+  void runMesherPipeline();
+
 };
 }  // namespace octomap_server
 

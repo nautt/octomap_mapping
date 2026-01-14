@@ -1,0 +1,1 @@
+ament_cmake_symlink_install_targets("TARGET_FILES" "/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server/custom_octomap_server_node" "TARGETS" "custom_octomap_server_node" "DESTINATION" "lib/octomap_server")

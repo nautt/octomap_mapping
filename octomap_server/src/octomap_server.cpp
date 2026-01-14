@@ -46,6 +46,7 @@
 // #include "/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/mixedoctree/include/Point3D.h"
 #include "mesher_roi/Point3D.h"
 #include <mesher_roi/Mesher.h>
+#include <mesher_roi/MesherOctreeAdapter.h>
 
 //Guardar archivo vtk
 #include <pcl/io/pcd_io.h>
@@ -69,10 +70,34 @@ bool update_param(const std::vector<rclcpp::Parameter> & p, const std::string & 
 namespace octomap_server
 {
 OctomapServer::OctomapServer(const rclcpp::NodeOptions & node_options)
-: Node("octomap_server", node_options)
+: Node("octomap_server", node_options),
+  has_latest_pointcloud_(false)
 {
   using std::placeholders::_1;
   using std::placeholders::_2;
+
+  mode = this->declare_parameter<std::string>("map_builder", "octomap");
+  //this->get_parameter("map_builder", mode);
+
+  RCLCPP_INFO(get_logger(), "map_builder: %s", mode.c_str());
+
+  if (mode == "mesher") {
+    octree_builder_mode_ = OctreeBuilderMode::MESHER_EXTERNAL;
+  } else {
+    octree_builder_mode_ = OctreeBuilderMode::OCTOMAP_NATIVE;
+  }
+
+  if (octree_builder_mode_ == OctreeBuilderMode::MESHER_EXTERNAL) {
+    build_map_srv_ = this->create_service<std_srvs::srv::Empty>(
+      "build_external_octomap",
+      std::bind(
+        &OctomapServer::buildExternalOctree,
+        this,
+        _1, _2));
+    RCLCPP_INFO(get_logger(), "OctomapServer running in MESHER_EXTERNAL mode.");
+  } else {
+    RCLCPP_INFO(get_logger(), "OctomapServer running in OCTOMAP_NATIVE mode.");
+  }
 
   world_frame_id_ = declare_parameter("frame_id", "map");
   base_frame_id_ = declare_parameter("base_frame_id", "base_footprint");
@@ -408,6 +433,18 @@ bool OctomapServer::openFile(const std::string & filename)
 
 void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
 {
+
+  if (octree_builder_mode_ == OctreeBuilderMode::MESHER_EXTERNAL) {
+    // Modo mesher: solo guardar snapshot de la nube y salir.
+    RCLCPP_INFO(get_logger(), "Saving cloud snapshot for external mesher...");
+    //std::lock_guard<std::mutex> lock(cloud_mutex_);
+    latest_cloud_ = *cloud;
+    latest_cloud_stamp_ = cloud->header.stamp;
+    has_latest_pointcloud_ = true;
+    return;
+  }
+
+  RCLCPP_INFO(get_logger(), "Starting octomap mode...");
   const auto start_time = rclcpp::Clock{}.now();
 
   //
@@ -423,10 +460,12 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
     //   // octomap::point3d point(it->x, it->y, it->z);
     // }
     
+    /* 
+    // Comentado para pruebas modo mesher.
     std::vector<Clobscode::Point3D> Point3DCloud;
     Point3DCloud = PointCloudConverter::toPoint3D(pc);
-
-
+    
+    
     // Bounding Box de nube de puntos para integracion con mesher_roi.
     PCLPoint minPt, maxPt;
     pcl::getMinMax3D(pc, minPt, maxPt);
@@ -440,41 +479,42 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
     RefinementRegion *rr;
     rr = new RefinementAllRegion(rl);
     all_regions.push_back(rr);
-
+    
     RCLCPP_INFO(this->get_logger(), "\nBounds:\n\tminPt:\t(%.2f, %.2f, %.2f)\n\tmaxPt:\t(%.2f, %.2f, %.2f)", minPt.x, minPt.y, minPt.z, maxPt.x, maxPt.y, maxPt.z);
-
+    
     RCLCPP_INFO(this->get_logger(), "Before mesher");
     Clobscode::FEMesh outputMesh = mesher.generateMesh(Point3DCloud, ref_level, "test", all_regions, bounds);
     RCLCPP_INFO(this->get_logger(), "After mesher");
-
+    
     Services::WriteVTK("octree",outputMesh);
     //pcl::io::savePCDFileBinary("snapshot.pcd", cloud);
     
-  // Comparar tamaños
-  //RCLCPP_INFO(this->get_logger(), "# PCLPointCloud: %lu\n# Point3D: %lu", pc.size(), Point3DCloud.size());
-
-  // Comparar puntos individuales
-  for (size_t i = 0; i < pc.size(); ++i) {
+    // Comparar tamaños
+    //RCLCPP_INFO(this->get_logger(), "# PCLPointCloud: %lu\n# Point3D: %lu", pc.size(), Point3DCloud.size());
+    
+    // Comparar puntos individuales
+    for (size_t i = 0; i < pc.size(); ++i) {
     const auto& pcl_point = pc[i];
     const auto& point3d_point = Point3DCloud[i];
     if (std::abs(pcl_point.x - point3d_point.X()) > 1e-6 ||
-        std::abs(pcl_point.y - point3d_point.Y()) > 1e-6 ||
-        std::abs(pcl_point.z - point3d_point.Z()) > 1e-6)
+    std::abs(pcl_point.y - point3d_point.Y()) > 1e-6 ||
+    std::abs(pcl_point.z - point3d_point.Z()) > 1e-6)
     {
       //RCLCPP_INFO(this->get_logger(), "\nMismatch: True\n# PCLPointCloud:\t(%.2f, %.2f, %.2f)\n# Point3D:\t(%.2f, %.2f, %.2f)", pcl_point.x, pcl_point.y, pcl_point.z, point3d_point.X(), point3d_point.Y(), point3d_point.Z());
     } else {
       //RCLCPP_INFO(this->get_logger(), "\nMismatch: False\n# PCLPointCloud:\t(%.2f, %.2f, %.2f)\n# Point3D:\t(%.2f, %.2f, %.2f)", pcl_point.x, pcl_point.y, pcl_point.z, point3d_point.X(), point3d_point.Y(), point3d_point.Z());
     }
   }
-
+  
   // Tree Depth
   // RCLCPP_INFO(this->get_logger(), "\nTree Depth: %lu\nMax Tree Depth: %lu", tree_depth_, max_tree_depth_);
-
-
-
+  
+  
+  
   // for (const auto& it : Point3DCloud) {
-  //   RCLCPP_INFO(this->get_logger(), "Point3D: x=%.2f, y=%.2f, z=%.2f", it.X(), it.Y(), it.Z());
-  // }
+    //   RCLCPP_INFO(this->get_logger(), "Point3D: x=%.2f, y=%.2f, z=%.2f", it.X(), it.Y(), it.Z());
+    // }
+  */
   //--------------------------------------------------------------------------
 
 
@@ -606,11 +646,95 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
 
   double total_elapsed = (rclcpp::Clock{}.now() - start_time).seconds();
   RCLCPP_DEBUG(
-    get_logger(),
+    this->get_logger(),
     "Pointcloud insertion in OctomapServer done (%zu+%zu pts (ground/nonground), %f sec)",
     pc_ground.size(), pc_nonground.size(), total_elapsed);
 
+  RCLCPP_INFO(get_logger(), "Publishing external octomap...");
   publishAll(cloud->header.stamp);
+}
+
+bool OctomapServer::buildExternalOctree(
+    const std::shared_ptr<std_srvs::srv::Empty::Request>,
+    std::shared_ptr<std_srvs::srv::Empty::Response>)
+{
+    if (!has_latest_pointcloud_) {
+        RCLCPP_WARN(get_logger(), "No cloud buffered");
+        return false;
+    }
+    runMesherPipeline();
+    RCLCPP_INFO(get_logger(), "Publishing external octomap...");
+    publishAll(latest_cloud_stamp_);
+    RCLCPP_INFO(get_logger(), "External octomap published.");
+    return true;
+}
+
+void OctomapServer::runMesherPipeline()
+{
+  // 1. Convertir latest_cloud_ → PCL
+  // 2. Convertir PCL → Point3D
+  // 3. Calcular bounding box
+  // 4. Ejecutar mesher.generateMesh(...)
+  // 5. Adaptar a octomap::OcTree
+  // 6. Reemplazar octree_
+  RCLCPP_INFO(get_logger(), "Executing runMesherPipeline...");
+
+  //1. Convertir latest_cloud_ → PCL
+  PCLPointCloud pc;
+  pcl::fromROSMsg(latest_cloud_, pc);
+  
+  //2. Convertir PCL → Point3D
+  std::vector<Clobscode::Point3D> point3d_cloud;
+  point3d_cloud = PointCloudConverter::toPoint3D(pc);
+  
+  //3. Calcular bounding box
+  PCLPoint minPt, maxPt;
+  pcl::getMinMax3D(pc, minPt, maxPt);
+  std::vector<double> bounds = {
+    minPt.x, minPt.y, minPt.z,
+    maxPt.x, maxPt.y, maxPt.z
+  };
+    
+  //4. Ejecutar mesher.generateMesh(...)
+  Clobscode::Mesher mesher;
+  unsigned short ref_level = max_tree_depth_;
+  unsigned short rl = 4;
+  
+  list<Clobscode::RefinementRegion *> all_regions;
+  all_regions.push_back(new RefinementAllRegion(rl));
+  
+  //RCLCPP_INFO(this->get_logger(), "\nBounds:\n\tminPt:\t(%.2f, %.2f, %.2f)\n\tmaxPt:\t(%.2f, %.2f, %.2f)", minPt.x, minPt.y, minPt.z, maxPt.x, maxPt.y, maxPt.z);
+  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] Running mesher...");
+  Clobscode::FEMesh outputMesh = mesher.generateMesh(point3d_cloud, ref_level, "external_octree", all_regions, bounds);
+  Services::WriteVTK("external_octree", outputMesh);
+  RCLCPP_INFO(get_logger(), "[MESHER] Mesher finished");
+  
+  //5. Adaptar mesher a octomap::OcTree
+  MesherOctreeAdapter<OcTreeT>::Params params;
+  params.occupied_logodds = octomap::logodds(0.97);
+  
+  MesherOctreeAdapter<OcTreeT> adapter(
+    mesher,
+    outputMesh.getPoints(),          // MeshPoint vector
+    res_,                           // octomap resolution
+    params
+  );
+
+  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] start buildOctomapTree with resolution %f...", res_);
+  std::unique_ptr<OcTreeT> new_tree = adapter.buildOctomapTree();
+  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] finished buildOctomapTree...");
+  
+  if (!new_tree) {
+    RCLCPP_ERROR(get_logger(), "[MESHER] Failed to build octomap tree");
+    return;
+  }
+    
+  // 6. Reemplazar octree interno
+  octree_.reset(new_tree.release());
+  tree_depth_ = octree_->getTreeDepth();
+  
+  RCLCPP_INFO(get_logger(), "[MESHER] External octree installed (depth=%lu, nodes=%zu)", tree_depth_, octree_->size());
+  
 }
 
 void OctomapServer::insertScan(
@@ -739,7 +863,6 @@ void OctomapServer::insertScan(
     octree_->prune();
   }
 }
-
 
 void OctomapServer::publishAll(const rclcpp::Time & rostime)
 {

@@ -1,0 +1,135 @@
+[0.077s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--symlink-install']
+[0.077s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=True, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=24, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x72bb0c3a84a0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x72bb0c387710>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x72bb0c387710>>, mixin_verb=('build',))
+[0.105s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.105s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.105s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.105s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.105s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.105s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.105s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping'
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.105s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extensions ['ignore', 'ignore_ament_install']
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extension 'ignore'
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extension 'ignore_ament_install'
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extensions ['colcon_pkg']
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extension 'colcon_pkg'
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extensions ['colcon_meta']
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extension 'colcon_meta'
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extensions ['ros']
+[0.123s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_mapping) by extension 'ros'
+[0.124s] DEBUG:colcon.colcon_core.package_identification:Package 'octomap_mapping' with type 'ros.ament_cmake' and name 'octomap_mapping'
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extensions ['ignore', 'ignore_ament_install']
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extension 'ignore'
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extension 'ignore_ament_install'
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extensions ['colcon_pkg']
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extension 'colcon_pkg'
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extensions ['colcon_meta']
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extension 'colcon_meta'
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extensions ['ros']
+[0.124s] Level 1:colcon.colcon_core.package_identification:_identify(octomap_server) by extension 'ros'
+[0.125s] DEBUG:colcon.colcon_core.package_identification:Package 'octomap_server' with type 'ros.ament_cmake' and name 'octomap_server'
+[0.125s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.125s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.125s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.125s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.125s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.137s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.137s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.139s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 8 installed packages in /home/tom/ros2_workspaces/ros2_ws/install
+[0.140s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 323 installed packages in /opt/ros/jazzy
+[0.140s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.160s] WARNING:colcon.colcon_core.package_selection:Some selected packages are already built in one or more underlay workspaces:
+	'octomap_server' is in: /opt/ros/jazzy, /home/tom/ros2_workspaces/ros2_ws/install/octomap_server
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding octomap_server
+
+This may be promoted to an error in a future release of colcon-override-check.
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'cmake_args' from command line to 'None'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'cmake_target' from command line to 'None'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'cmake_clean_cache' from command line to 'False'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'cmake_clean_first' from command line to 'False'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'cmake_force_configure' from command line to 'False'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'ament_cmake_args' from command line to 'None'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'catkin_cmake_args' from command line to 'None'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_server' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.161s] DEBUG:colcon.colcon_core.verb:Building package 'octomap_server' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server', 'merge_install': False, 'path': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/octomap_server', 'symlink_install': True, 'test_result_base': None}
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'cmake_args' from command line to 'None'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'cmake_target' from command line to 'None'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'cmake_clean_cache' from command line to 'False'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'cmake_clean_first' from command line to 'False'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'cmake_force_configure' from command line to 'False'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'ament_cmake_args' from command line to 'None'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'catkin_cmake_args' from command line to 'None'
+[0.161s] Level 5:colcon.colcon_core.verb:set package 'octomap_mapping' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.161s] DEBUG:colcon.colcon_core.verb:Building package 'octomap_mapping' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_mapping', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_mapping', 'merge_install': False, 'path': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/octomap_mapping', 'symlink_install': True, 'test_result_base': None}
+[0.161s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.162s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.162s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/octomap_server' with build type 'ament_cmake'
+[0.162s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/octomap_server'
+[0.164s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.164s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.164s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.168s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server': CMAKE_PREFIX_PATH=/home/tom/ros2_workspaces/ros2_ws/install/pointcloud_saver:/home/tom/ros2_workspaces/ros2_ws/install/octomap_tugbot:/home/tom/ros2_workspaces/ros2_ws/install/octomap_mapping:/opt/ros/jazzy:/home/tom/ros2_workspaces/ros2_ws/install/octomap_server:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins:/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution:/home/tom/ros2_workspaces/ros2_ws/install/octomap:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/octomap_server -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server
+[4.334s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server' returned '0': CMAKE_PREFIX_PATH=/home/tom/ros2_workspaces/ros2_ws/install/pointcloud_saver:/home/tom/ros2_workspaces/ros2_ws/install/octomap_tugbot:/home/tom/ros2_workspaces/ros2_ws/install/octomap_mapping:/opt/ros/jazzy:/home/tom/ros2_workspaces/ros2_ws/install/octomap_server:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins:/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution:/home/tom/ros2_workspaces/ros2_ws/install/octomap:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/octomap_server -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server
+[4.335s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server': CMAKE_PREFIX_PATH=/home/tom/ros2_workspaces/ros2_ws/install/pointcloud_saver:/home/tom/ros2_workspaces/ros2_ws/install/octomap_tugbot:/home/tom/ros2_workspaces/ros2_ws/install/octomap_mapping:/opt/ros/jazzy:/home/tom/ros2_workspaces/ros2_ws/install/octomap_server:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins:/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution:/home/tom/ros2_workspaces/ros2_ws/install/octomap:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server -- -j24 -l24
+[23.404s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete was interrupted
+[23.404s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete again
+[23.440s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server' returned '-2': CMAKE_PREFIX_PATH=/home/tom/ros2_workspaces/ros2_ws/install/pointcloud_saver:/home/tom/ros2_workspaces/ros2_ws/install/octomap_tugbot:/home/tom/ros2_workspaces/ros2_ws/install/octomap_mapping:/opt/ros/jazzy:/home/tom/ros2_workspaces/ros2_ws/install/octomap_server:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins:/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution:/home/tom/ros2_workspaces/ros2_ws/install/octomap:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server -- -j24 -l24
+[23.441s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(octomap_server)
+[23.444s] Level 1:colcon.colcon_core.environment:checking '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server' for CMake module files
+[23.444s] Level 1:colcon.colcon_core.environment:checking '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server' for CMake config files
+[23.444s] Level 1:colcon.colcon_core.environment:checking '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/bin'
+[23.444s] Level 1:colcon.colcon_core.environment:checking '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/lib/pkgconfig/octomap_server.pc'
+[23.444s] Level 1:colcon.colcon_core.environment:checking '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/lib/python3.12/site-packages'
+[23.445s] Level 1:colcon.colcon_core.environment:checking '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/bin'
+[23.445s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/share/octomap_server/package.ps1'
+[23.445s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/share/octomap_server/package.dsv'
+[23.445s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/share/octomap_server/package.sh'
+[23.446s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/share/octomap_server/package.bash'
+[23.446s] INFO:colcon.colcon_core.shell:Creating package script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/share/octomap_server/package.zsh'
+[23.446s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server/share/colcon-core/packages/octomap_server)
+[23.457s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished
+[23.457s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[23.457s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[23.457s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[23.463s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[23.463s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[23.463s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[23.501s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[23.501s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/local_setup.ps1'
+[23.503s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/_local_setup_util_ps1.py'
+[23.505s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/setup.ps1'
+[23.508s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/local_setup.sh'
+[23.510s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/_local_setup_util_sh.py'
+[23.511s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/setup.sh'
+[23.514s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/local_setup.bash'
+[23.515s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/setup.bash'
+[23.517s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/local_setup.zsh'
+[23.518s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/setup.zsh'

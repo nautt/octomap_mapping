@@ -1,0 +1,438 @@
+[0.000000] (-) TimerEvent: {}
+[0.000344] (octomap_server) JobQueued: {'identifier': 'octomap_server', 'dependencies': OrderedDict()}
+[0.000371] (octomap_mapping) JobQueued: {'identifier': 'octomap_mapping', 'dependencies': OrderedDict({'octomap_server': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server'})}
+[0.000392] (octomap_server) JobStarted: {'identifier': 'octomap_server'}
+[0.005280] (octomap_server) JobProgress: {'identifier': 'octomap_server', 'progress': 'cmake'}
+[0.005727] (octomap_server) Command: {'cmd': ['/usr/bin/cmake', '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/octomap_server', '-DAMENT_CMAKE_SYMLINK_INSTALL=1', '-DCMAKE_INSTALL_PREFIX=/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/install/octomap_server'], 'cwd': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server', 'env': OrderedDict({'GJS_DEBUG_TOPICS': 'JS ERROR;JS LOG', 'XDG_ACTIVATION_TOKEN': 'gnome-shell/Terminator/2165-3-tom-Z790-PG-Lightning_TIME1183780', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'tom', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'XDG_SESSION_TYPE': 'x11', 'CLUTTER_DISABLE_MIPMAPPED_TEXT': '1', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/tom/ros2_workspaces/ros2_ws/install/octomap_server/lib:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins/lib:/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution/lib:/home/tom/ros2_workspaces/ros2_ws/install/octomap/lib:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi/lib:/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/tom', 'OLDPWD': '/home/tom/ros2_workspaces/ros2_ws', 'DESKTOP_SESSION': 'ubuntu', 'GIO_LAUNCHED_DESKTOP_FILE': '/usr/share/applications/terminator.desktop', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'MANAGERPID': '1800', 'SYSTEMD_EXEC_PID': '2165', 'GSM_SKIP_SSH_AGENT_WORKAROUND': 'true', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'TERMINATOR_DBUS_NAME': 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873', 'GIO_LAUNCHED_DESKTOP_FILE_PID': '15417', '_colcon_cd_root': '/opt/ros/jazzy/', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'COLCON_PREFIX_PATH': '/home/tom/ros2_workspaces/ros2_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'tom', 'JOURNAL_STREAM': '9:30889', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'PKG_CONFIG_PATH': '/home/tom/ros2_workspaces/ros2_ws/install/octomap/lib/x86_64-linux-gnu/pkgconfig:/home/tom/ros2_workspaces/ros2_ws/install/octomap/lib/pkgconfig', 'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@x11.service/memory.pressure', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'tom', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'WINDOWPATH': '2', 'PATH': '/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution/bin:/home/tom/ros2_workspaces/ros2_ws/install/octomap/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/tom-Z790-PG-Lightning:@/tmp/.ICE-unix/2133,unix/tom-Z790-PG-Lightning:/tmp/.ICE-unix/2133', 'INVOCATION_ID': '797e255aa9ec490f89557d1c5311c9a0', 'XDG_MENU_PREFIX': 'gnome-', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':0', 'TERMINATOR_DBUS_PATH': '/net/tenshu/Terminator2', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'ROS_DOMAIN_ID': '0', 'AMENT_PREFIX_PATH': '/home/tom/ros2_workspaces/ros2_ws/install/pointcloud_saver:/home/tom/ros2_workspaces/ros2_ws/install/octomap_tugbot:/home/tom/ros2_workspaces/ros2_ws/install/octomap_mapping:/home/tom/ros2_workspaces/ros2_ws/install/octomap_server:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'TERMINATOR_UUID': 'urn:uuid:ec7a035f-1628-4093-a8e3-214490cefe8f', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'IGN_GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'GJS_DEBUG_OUTPUT': 'stderr', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server', 'LC_ALL': 'en_US.UTF-8', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=', 'VTE_VERSION': '7600', 'CMAKE_PREFIX_PATH': '/home/tom/ros2_workspaces/ros2_ws/install/pointcloud_saver:/home/tom/ros2_workspaces/ros2_ws/install/octomap_tugbot:/home/tom/ros2_workspaces/ros2_ws/install/octomap_mapping:/opt/ros/jazzy:/home/tom/ros2_workspaces/ros2_ws/install/octomap_server:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins:/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution:/home/tom/ros2_workspaces/ros2_ws/install/octomap:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor'}), 'shell': False}
+[0.099923] (-) TimerEvent: {}
+[0.113560] (octomap_server) StdoutLine: {'line': b'-- The C compiler identification is GNU 13.3.0\n'}
+[0.200042] (-) TimerEvent: {}
+[0.221812] (octomap_server) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 13.3.0\n'}
+[0.234031] (octomap_server) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.300133] (-) TimerEvent: {}
+[0.312039] (octomap_server) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.320816] (octomap_server) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[0.321161] (octomap_server) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.321588] (octomap_server) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.330965] (octomap_server) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.400278] (-) TimerEvent: {}
+[0.497698] (octomap_server) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.500403] (-) TimerEvent: {}
+[0.513044] (octomap_server) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[0.513854] (octomap_server) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.514763] (octomap_server) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.567457] (octomap_server) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake (found suitable version "1.83.0", minimum required is "1.65.0") found components: system filesystem iostreams serialization \n'}
+[0.568353] (octomap_server) StderrLine: {'line': b'\x1b[33mCMake Warning (dev) at /usr/lib/x86_64-linux-gnu/cmake/pcl/Modules/FindFLANN.cmake:45 (find_package):\n'}
+[0.568451] (octomap_server) StderrLine: {'line': b'  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT\n'}
+[0.568517] (octomap_server) StderrLine: {'line': b'  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the\n'}
+[0.568578] (octomap_server) StderrLine: {'line': b'  cmake_policy command to set the policy and suppress this warning.\n'}
+[0.568637] (octomap_server) StderrLine: {'line': b'\n'}
+[0.568695] (octomap_server) StderrLine: {'line': b'  CMake variable FLANN_ROOT is set to:\n'}
+[0.568759] (octomap_server) StderrLine: {'line': b'\n'}
+[0.568819] (octomap_server) StderrLine: {'line': b'    /usr\n'}
+[0.568874] (octomap_server) StderrLine: {'line': b'\n'}
+[0.568929] (octomap_server) StderrLine: {'line': b'  For compatibility, find_package is ignoring the variable, but code in a\n'}
+[0.568985] (octomap_server) StderrLine: {'line': b'  .cmake module might still use it.\n'}
+[0.569039] (octomap_server) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[0.569094] (octomap_server) StderrLine: {'line': b'  /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:261 (find_package)\n'}
+[0.569150] (octomap_server) StderrLine: {'line': b'  /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:306 (find_flann)\n'}
+[0.569204] (octomap_server) StderrLine: {'line': b'  /usr/lib/x86_64-linux-gnu/cmake/pcl/PCLConfig.cmake:570 (find_external_library)\n'}
+[0.569276] (octomap_server) StderrLine: {'line': b'  CMakeLists.txt:13 (find_package)\n'}
+[0.569339] (octomap_server) StderrLine: {'line': b'This warning is for project developers.  Use -Wno-dev to suppress it.\n'}
+[0.569394] (octomap_server) StderrLine: {'line': b'\x1b[0m\n'}
+[0.569448] (octomap_server) StdoutLine: {'line': b'-- Found flann version 1.9.2\n'}
+[0.600498] (-) TimerEvent: {}
+[0.700852] (-) TimerEvent: {}
+[0.801337] (-) TimerEvent: {}
+[0.901611] (-) TimerEvent: {}
+[0.917739] (octomap_server) StdoutLine: {'line': b'-- Found OpenMP_CXX: -fopenmp (found version "4.5") \n'}
+[0.918323] (octomap_server) StdoutLine: {'line': b'-- Found OpenMP: TRUE (found version "4.5") found components: CXX \n'}
+[0.950677] (octomap_server) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[1.001719] (-) TimerEvent: {}
+[1.071368] (octomap_server) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success\n'}
+[1.072704] (octomap_server) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[1.075333] (octomap_server) StdoutLine: {'line': b'-- Found GLEW: /usr/lib/x86_64-linux-gnu/libGLEW.so  \n'}
+[1.089843] (octomap_server) StdoutLine: {'line': b'-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so  found components: OpenGL GLX \n'}
+[1.101777] (-) TimerEvent: {}
+[1.201954] (-) TimerEvent: {}
+[1.210243] (octomap_server) StdoutLine: {'line': b'-- Found MPI_C: /usr/lib/x86_64-linux-gnu/libmpi.so (found version "3.1") \n'}
+[1.210588] (octomap_server) StdoutLine: {'line': b'-- Found MPI: TRUE (found version "3.1") found components: C \n'}
+[1.213429] (octomap_server) StdoutLine: {'line': b'-- Found JsonCpp: /usr/lib/x86_64-linux-gnu/libjsoncpp.so (found suitable version "1.9.5", minimum required is "0.7.0") \n'}
+[1.223446] (octomap_server) StdoutLine: {'line': b'-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3")  \n'}
+[1.238564] (octomap_server) StdoutLine: {'line': b'-- Found PNG: /usr/lib/x86_64-linux-gnu/libpng.so (found version "1.6.43") \n'}
+[1.252786] (octomap_server) StdoutLine: {'line': b'-- Found Eigen3: /usr/include/eigen3 (found version "3.4.0") \n'}
+[1.302032] (-) TimerEvent: {}
+[1.386052] (octomap_server) StdoutLine: {'line': b'-- Found X11: /usr/include   \n'}
+[1.386373] (octomap_server) StdoutLine: {'line': b'-- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so\n'}
+[1.402147] (-) TimerEvent: {}
+[1.446145] (octomap_server) StdoutLine: {'line': b'-- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so - found\n'}
+[1.446326] (octomap_server) StdoutLine: {'line': b'-- Looking for gethostbyname\n'}
+[1.493499] (octomap_server) StdoutLine: {'line': b'-- Looking for gethostbyname - found\n'}
+[1.493682] (octomap_server) StdoutLine: {'line': b'-- Looking for connect\n'}
+[1.502208] (-) TimerEvent: {}
+[1.541885] (octomap_server) StdoutLine: {'line': b'-- Looking for connect - found\n'}
+[1.541999] (octomap_server) StdoutLine: {'line': b'-- Looking for remove\n'}
+[1.593076] (octomap_server) StdoutLine: {'line': b'-- Looking for remove - found\n'}
+[1.593182] (octomap_server) StdoutLine: {'line': b'-- Looking for shmat\n'}
+[1.602293] (-) TimerEvent: {}
+[1.649872] (octomap_server) StdoutLine: {'line': b'-- Looking for shmat - found\n'}
+[1.649989] (octomap_server) StdoutLine: {'line': b'-- Looking for IceConnectionNumber in ICE\n'}
+[1.702378] (-) TimerEvent: {}
+[1.703291] (octomap_server) StdoutLine: {'line': b'-- Looking for IceConnectionNumber in ICE - found\n'}
+[1.791567] (octomap_server) StdoutLine: {'line': b'-- Found EXPAT: /usr/lib/x86_64-linux-gnu/libexpat.so (found version "2.6.1") \n'}
+[1.793371] (octomap_server) StdoutLine: {'line': b'-- Found double-conversion: /usr/lib/x86_64-linux-gnu/libdouble-conversion.so  \n'}
+[1.795304] (octomap_server) StdoutLine: {'line': b'-- Found LZ4: /usr/lib/x86_64-linux-gnu/liblz4.so (found version "1.9.4") \n'}
+[1.796582] (octomap_server) StdoutLine: {'line': b'-- Found LZMA: /usr/lib/x86_64-linux-gnu/liblzma.so (found version "5.4.5") \n'}
+[1.802436] (-) TimerEvent: {}
+[1.807868] (octomap_server) StdoutLine: {'line': b'-- Found JPEG: /usr/lib/x86_64-linux-gnu/libjpeg.so (found version "80") \n'}
+[1.821057] (octomap_server) StdoutLine: {'line': b'-- Found TIFF: /usr/lib/x86_64-linux-gnu/libtiff.so (found version "4.5.1")  \n'}
+[1.823587] (octomap_server) StdoutLine: {'line': b'-- Found Freetype: /usr/lib/x86_64-linux-gnu/libfreetype.so (found version "2.13.2") \n'}
+[1.827848] (octomap_server) StdoutLine: {'line': b'-- Found utf8cpp: /usr/include/utf8cpp  \n'}
+[1.881872] (octomap_server) StdoutLine: {'line': b"-- Checking for module 'libusb-1.0'\n"}
+[1.891273] (octomap_server) StdoutLine: {'line': b'--   Found libusb-1.0, version 1.0.27\n'}
+[1.902522] (-) TimerEvent: {}
+[1.913649] (octomap_server) StdoutLine: {'line': b'-- Found libusb: /usr/lib/x86_64-linux-gnu/libusb-1.0.so  \n'}
+[1.914263] (octomap_server) StdoutLine: {'line': b'-- Found OpenNI: /usr/lib/libOpenNI.so;libusb::libusb (found version "1.5.4.0") \n'}
+[1.914307] (octomap_server) StdoutLine: {'line': b'-- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)\n'}
+[1.952912] (octomap_server) StdoutLine: {'line': b'-- Found OpenNI2: /usr/lib/x86_64-linux-gnu/libOpenNI2.so;libusb::libusb (found version "2.2.0.33") \n'}
+[1.953022] (octomap_server) StdoutLine: {'line': b'-- OpenNI2 found (version: 2.2.0.33, include: /usr/include/openni2, lib: /usr/lib/x86_64-linux-gnu/libOpenNI2.so;libusb::libusb)\n'}
+[1.956059] (octomap_server) StdoutLine: {'line': b'-- Could NOT find Pcap (missing: PCAP_LIBRARIES PCAP_INCLUDE_DIRS) \n'}
+[1.956181] (octomap_server) StderrLine: {'line': b'\x1b[0m** WARNING ** io features related to pcap will be disabled\x1b[0m\n'}
+[2.002605] (-) TimerEvent: {}
+[2.102778] (-) TimerEvent: {}
+[2.202958] (-) TimerEvent: {}
+[2.247486] (octomap_server) StdoutLine: {'line': b'-- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)\n'}
+[2.251985] (octomap_server) StdoutLine: {'line': b'-- OpenNI2 found (version: 2.2.0.33, include: /usr/include/openni2, lib: /usr/lib/x86_64-linux-gnu/libOpenNI2.so;libusb::libusb)\n'}
+[2.303048] (-) TimerEvent: {}
+[2.403232] (-) TimerEvent: {}
+[2.503425] (-) TimerEvent: {}
+[2.517915] (octomap_server) StdoutLine: {'line': b'-- Found Qhull version 8.0.2\n'}
+[2.603519] (-) TimerEvent: {}
+[2.703713] (-) TimerEvent: {}
+[2.789120] (octomap_server) StdoutLine: {'line': b'-- OpenNI found (version: 1.5.4.0, include: /usr/include/ni, lib: /usr/lib/libOpenNI.so;libusb::libusb)\n'}
+[2.803774] (-) TimerEvent: {}
+[2.903940] (-) TimerEvent: {}
+[3.004118] (-) TimerEvent: {}
+[3.042148] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_COMMON\n'}
+[3.042933] (octomap_server) StdoutLine: {'line': b'-- Found PCL_COMMON: /usr/lib/x86_64-linux-gnu/libpcl_common.so  \n'}
+[3.043035] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_KDTREE\n'}
+[3.043797] (octomap_server) StdoutLine: {'line': b'-- Found PCL_KDTREE: /usr/lib/x86_64-linux-gnu/libpcl_kdtree.so  \n'}
+[3.043977] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_OCTREE\n'}
+[3.044702] (octomap_server) StdoutLine: {'line': b'-- Found PCL_OCTREE: /usr/lib/x86_64-linux-gnu/libpcl_octree.so  \n'}
+[3.044839] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_SEARCH\n'}
+[3.045541] (octomap_server) StdoutLine: {'line': b'-- Found PCL_SEARCH: /usr/lib/x86_64-linux-gnu/libpcl_search.so  \n'}
+[3.045653] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_SAMPLE_CONSENSUS\n'}
+[3.046257] (octomap_server) StdoutLine: {'line': b'-- Found PCL_SAMPLE_CONSENSUS: /usr/lib/x86_64-linux-gnu/libpcl_sample_consensus.so  \n'}
+[3.046351] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_FILTERS\n'}
+[3.046938] (octomap_server) StdoutLine: {'line': b'-- Found PCL_FILTERS: /usr/lib/x86_64-linux-gnu/libpcl_filters.so  \n'}
+[3.047049] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_2D\n'}
+[3.047178] (octomap_server) StdoutLine: {'line': b'-- Found PCL_2D: /usr/include/pcl-1.14  \n'}
+[3.047261] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_GEOMETRY\n'}
+[3.047384] (octomap_server) StdoutLine: {'line': b'-- Found PCL_GEOMETRY: /usr/include/pcl-1.14  \n'}
+[3.047445] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_IO\n'}
+[3.048044] (octomap_server) StdoutLine: {'line': b'-- Found PCL_IO: /usr/lib/x86_64-linux-gnu/libpcl_io.so  \n'}
+[3.048159] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_FEATURES\n'}
+[3.048723] (octomap_server) StdoutLine: {'line': b'-- Found PCL_FEATURES: /usr/lib/x86_64-linux-gnu/libpcl_features.so  \n'}
+[3.048860] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_ML\n'}
+[3.049446] (octomap_server) StdoutLine: {'line': b'-- Found PCL_ML: /usr/lib/x86_64-linux-gnu/libpcl_ml.so  \n'}
+[3.049529] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_SEGMENTATION\n'}
+[3.050145] (octomap_server) StdoutLine: {'line': b'-- Found PCL_SEGMENTATION: /usr/lib/x86_64-linux-gnu/libpcl_segmentation.so  \n'}
+[3.050288] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_VISUALIZATION\n'}
+[3.050915] (octomap_server) StdoutLine: {'line': b'-- Found PCL_VISUALIZATION: /usr/lib/x86_64-linux-gnu/libpcl_visualization.so  \n'}
+[3.051042] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_SURFACE\n'}
+[3.051642] (octomap_server) StdoutLine: {'line': b'-- Found PCL_SURFACE: /usr/lib/x86_64-linux-gnu/libpcl_surface.so  \n'}
+[3.051750] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_REGISTRATION\n'}
+[3.052378] (octomap_server) StdoutLine: {'line': b'-- Found PCL_REGISTRATION: /usr/lib/x86_64-linux-gnu/libpcl_registration.so  \n'}
+[3.052501] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_KEYPOINTS\n'}
+[3.053122] (octomap_server) StdoutLine: {'line': b'-- Found PCL_KEYPOINTS: /usr/lib/x86_64-linux-gnu/libpcl_keypoints.so  \n'}
+[3.053243] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_TRACKING\n'}
+[3.053896] (octomap_server) StdoutLine: {'line': b'-- Found PCL_TRACKING: /usr/lib/x86_64-linux-gnu/libpcl_tracking.so  \n'}
+[3.054014] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_RECOGNITION\n'}
+[3.054614] (octomap_server) StdoutLine: {'line': b'-- Found PCL_RECOGNITION: /usr/lib/x86_64-linux-gnu/libpcl_recognition.so  \n'}
+[3.054789] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_STEREO\n'}
+[3.055368] (octomap_server) StdoutLine: {'line': b'-- Found PCL_STEREO: /usr/lib/x86_64-linux-gnu/libpcl_stereo.so  \n'}
+[3.055459] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_APPS\n'}
+[3.056076] (octomap_server) StdoutLine: {'line': b'-- Found PCL_APPS: /usr/lib/x86_64-linux-gnu/libpcl_apps.so  \n'}
+[3.056384] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_IN_HAND_SCANNER\n'}
+[3.056552] (octomap_server) StdoutLine: {'line': b'-- Found PCL_IN_HAND_SCANNER: /usr/include/pcl-1.14  \n'}
+[3.056613] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_MODELER\n'}
+[3.056777] (octomap_server) StdoutLine: {'line': b'-- Found PCL_MODELER: /usr/include/pcl-1.14  \n'}
+[3.056833] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_POINT_CLOUD_EDITOR\n'}
+[3.057031] (octomap_server) StdoutLine: {'line': b'-- Found PCL_POINT_CLOUD_EDITOR: /usr/include/pcl-1.14  \n'}
+[3.057092] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_OUTOFCORE\n'}
+[3.057697] (octomap_server) StdoutLine: {'line': b'-- Found PCL_OUTOFCORE: /usr/lib/x86_64-linux-gnu/libpcl_outofcore.so  \n'}
+[3.057821] (octomap_server) StdoutLine: {'line': b'-- looking for PCL_PEOPLE\n'}
+[3.058417] (octomap_server) StdoutLine: {'line': b'-- Found PCL_PEOPLE: /usr/lib/x86_64-linux-gnu/libpcl_people.so  \n'}
+[3.058898] (octomap_server) StdoutLine: {'line': b'-- Found PCL: pcl_common;pcl_kdtree;pcl_octree;pcl_search;pcl_sample_consensus;pcl_filters;pcl_io;pcl_features;pcl_ml;pcl_segmentation;pcl_visualization;pcl_surface;pcl_registration;pcl_keypoints;pcl_tracking;pcl_recognition;pcl_stereo;pcl_apps;pcl_outofcore;pcl_people;Boost::system;Boost::filesystem;Boost::iostreams;Boost::serialization;/usr/lib/libOpenNI.so;libusb::libusb;/usr/lib/x86_64-linux-gnu/libOpenNI2.so;libusb::libusb;VTK::ChartsCore;VTK::CommonColor;VTK::CommonComputationalGeometry;VTK::CommonCore;VTK::CommonDataModel;VTK::CommonExecutionModel;VTK::CommonMath;VTK::CommonMisc;VTK::CommonTransforms;VTK::FiltersCore;VTK::FiltersExtraction;VTK::FiltersGeneral;VTK::FiltersGeometry;VTK::FiltersModeling;VTK::FiltersSources;VTK::ImagingCore;VTK::ImagingSources;VTK::InteractionImage;VTK::InteractionStyle;VTK::InteractionWidgets;VTK::IOCore;VTK::IOGeometry;VTK::IOImage;VTK::IOLegacy;VTK::IOPLY;VTK::RenderingAnnotation;VTK::RenderingCore;VTK::RenderingContext2D;VTK::RenderingLOD;VTK::RenderingFreeType;VTK::ViewsCore;VTK::ViewsContext2D;VTK::RenderingOpenGL2;VTK::RenderingContextOpenGL2;VTK::GUISupportQt;FLANN::FLANN;QHULL::QHULL  \n'}
+[3.059976] (octomap_server) StdoutLine: {'line': b'-- Found ament_cmake_auto: 2.5.4 (/opt/ros/jazzy/share/ament_cmake_auto/cmake)\n'}
+[3.104186] (-) TimerEvent: {}
+[3.151415] (octomap_server) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter \n'}
+[3.200617] (octomap_server) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[3.204261] (-) TimerEvent: {}
+[3.295404] (octomap_server) StdoutLine: {'line': b'-- Found rosidl_generator_c: 4.6.5 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)\n'}
+[3.304329] (-) TimerEvent: {}
+[3.305826] (octomap_server) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 4.6.5 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)\n'}
+[3.317054] (octomap_server) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[3.334131] (octomap_server) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[3.404433] (-) TimerEvent: {}
+[3.480845] (octomap_server) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 7.3.2 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)\n'}
+[3.482889] (octomap_server) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 8.4.2 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)\n'}
+[3.504505] (-) TimerEvent: {}
+[3.546655] (octomap_server) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.13")  \n'}
+[3.558398] (octomap_server) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/jazzy/include (Required is at least version "2.13") \n'}
+[3.574314] (octomap_server) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[3.604591] (-) TimerEvent: {}
+[3.704775] (-) TimerEvent: {}
+[3.803026] (octomap_server) StdoutLine: {'line': b'-- Found eigen3_cmake_module: 0.3.0 (/opt/ros/jazzy/share/eigen3_cmake_module/cmake)\n'}
+[3.803933] (octomap_server) StdoutLine: {'line': b'-- Found Eigen3: TRUE (found version "3.4.0") \n'}
+[3.803982] (octomap_server) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[3.804826] (-) TimerEvent: {}
+[3.904959] (-) TimerEvent: {}
+[3.912063] (octomap_server) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.17.2 (/opt/ros/jazzy/share/ament_lint_auto/cmake)\n'}
+[3.923298] (octomap_server) StderrLine: {'line': b'\x1b[0mIn this package, headers install destination is set to `include` by ament_auto_package. It is recommended to install `include/octomap_server` instead and will be the default behavior of ament_auto_package from ROS 2 Kilted Kaiju. On distributions before Kilted, ament_auto_package behaves the same way when you use USE_SCOPED_HEADER_INSTALL_DIR option.\x1b[0m\n'}
+[3.927140] (octomap_server) StdoutLine: {'line': b"-- Added test 'copyright' to check source files copyright and LICENSE\n"}
+[3.928047] (octomap_server) StdoutLine: {'line': b"-- Added test 'cppcheck' to perform static code analysis on C / C++ code\n"}
+[3.929536] (octomap_server) StdoutLine: {'line': b'-- Configured cppcheck include dirs: /home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/octomap_server/include\n'}
+[3.929568] (octomap_server) StdoutLine: {'line': b'-- Configured cppcheck exclude dirs and/or files: \n'}
+[3.930302] (octomap_server) StdoutLine: {'line': b"-- Added test 'cpplint' to check C / C++ code against the Google style\n"}
+[3.930347] (octomap_server) StdoutLine: {'line': b'-- Configured cpplint exclude dirs and/or files: \n'}
+[3.930758] (octomap_server) StdoutLine: {'line': b"-- Added test 'flake8' to check Python code syntax and style conventions\n"}
+[3.930786] (octomap_server) StdoutLine: {'line': b"-- Configured 'flake8' exclude dirs and/or files: \n"}
+[3.931222] (octomap_server) StdoutLine: {'line': b"-- Added test 'lint_cmake' to check CMake code style\n"}
+[3.931644] (octomap_server) StdoutLine: {'line': b"-- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257\n"}
+[3.932367] (octomap_server) StdoutLine: {'line': b"-- Added test 'uncrustify' to check C / C++ code style\n"}
+[3.932416] (octomap_server) StdoutLine: {'line': b'-- Configured uncrustify additional arguments: \n'}
+[3.932804] (octomap_server) StdoutLine: {'line': b"-- Added test 'xmllint' to check XML markup files\n"}
+[3.935170] (octomap_server) StdoutLine: {'line': b'-- Configuring done (3.9s)\n'}
+[4.005079] (-) TimerEvent: {}
+[4.105388] (-) TimerEvent: {}
+[4.142980] (octomap_server) StdoutLine: {'line': b'-- Generating done (0.2s)\n'}
+[4.160339] (octomap_server) StdoutLine: {'line': b'-- Build files have been written to: /home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server\n'}
+[4.171724] (octomap_server) CommandEnded: {'returncode': 0}
+[4.172177] (octomap_server) JobProgress: {'identifier': 'octomap_server', 'progress': 'build'}
+[4.172620] (octomap_server) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server', '--', '-j24', '-l24'], 'cwd': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server', 'env': OrderedDict({'GJS_DEBUG_TOPICS': 'JS ERROR;JS LOG', 'XDG_ACTIVATION_TOKEN': 'gnome-shell/Terminator/2165-3-tom-Z790-PG-Lightning_TIME1183780', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'tom', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'XDG_SESSION_TYPE': 'x11', 'CLUTTER_DISABLE_MIPMAPPED_TEXT': '1', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/tom/ros2_workspaces/ros2_ws/install/octomap_server/lib:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins/lib:/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution/lib:/home/tom/ros2_workspaces/ros2_ws/install/octomap/lib:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi/lib:/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/tom', 'OLDPWD': '/home/tom/ros2_workspaces/ros2_ws', 'DESKTOP_SESSION': 'ubuntu', 'GIO_LAUNCHED_DESKTOP_FILE': '/usr/share/applications/terminator.desktop', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'MANAGERPID': '1800', 'SYSTEMD_EXEC_PID': '2165', 'GSM_SKIP_SSH_AGENT_WORKAROUND': 'true', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'TERMINATOR_DBUS_NAME': 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873', 'GIO_LAUNCHED_DESKTOP_FILE_PID': '15417', '_colcon_cd_root': '/opt/ros/jazzy/', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'COLCON_PREFIX_PATH': '/home/tom/ros2_workspaces/ros2_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'tom', 'JOURNAL_STREAM': '9:30889', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'PKG_CONFIG_PATH': '/home/tom/ros2_workspaces/ros2_ws/install/octomap/lib/x86_64-linux-gnu/pkgconfig:/home/tom/ros2_workspaces/ros2_ws/install/octomap/lib/pkgconfig', 'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@x11.service/memory.pressure', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'tom', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'WINDOWPATH': '2', 'PATH': '/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution/bin:/home/tom/ros2_workspaces/ros2_ws/install/octomap/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/tom-Z790-PG-Lightning:@/tmp/.ICE-unix/2133,unix/tom-Z790-PG-Lightning:/tmp/.ICE-unix/2133', 'INVOCATION_ID': '797e255aa9ec490f89557d1c5311c9a0', 'XDG_MENU_PREFIX': 'gnome-', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':0', 'TERMINATOR_DBUS_PATH': '/net/tenshu/Terminator2', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'ROS_DOMAIN_ID': '0', 'AMENT_PREFIX_PATH': '/home/tom/ros2_workspaces/ros2_ws/install/pointcloud_saver:/home/tom/ros2_workspaces/ros2_ws/install/octomap_tugbot:/home/tom/ros2_workspaces/ros2_ws/install/octomap_mapping:/home/tom/ros2_workspaces/ros2_ws/install/octomap_server:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'TERMINATOR_UUID': 'urn:uuid:ec7a035f-1628-4093-a8e3-214490cefe8f', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'IGN_GAZEBO_RESOURCE_PATH': '/opt/ros/jazzy/share', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'GJS_DEBUG_OUTPUT': 'stderr', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/build/octomap_server', 'LC_ALL': 'en_US.UTF-8', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=', 'VTE_VERSION': '7600', 'CMAKE_PREFIX_PATH': '/home/tom/ros2_workspaces/ros2_ws/install/pointcloud_saver:/home/tom/ros2_workspaces/ros2_ws/install/octomap_tugbot:/home/tom/ros2_workspaces/ros2_ws/install/octomap_mapping:/opt/ros/jazzy:/home/tom/ros2_workspaces/ros2_ws/install/octomap_server:/home/tom/ros2_workspaces/ros2_ws/install/octomap_rviz_plugins:/home/tom/ros2_workspaces/ros2_ws/install/octomap-distribution:/home/tom/ros2_workspaces/ros2_ws/install/octomap:/home/tom/ros2_workspaces/ros2_ws/install/mesher_roi:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor'}), 'shell': False}
+[4.205491] (-) TimerEvent: {}
+[4.255061] (octomap_server) StdoutLine: {'line': b'[  3%] \x1b[32mBuilding CXX object CMakeFiles/custom_octomap_server_node.dir/rclcpp_components/node_main_custom_octomap_server_node.cpp.o\x1b[0m\n'}
+[4.256030] (octomap_server) StdoutLine: {'line': b'[ 11%] \x1b[32mBuilding CXX object CMakeFiles/octomap_server_static_node.dir/rclcpp_components/node_main_octomap_server_static_node.cpp.o\x1b[0m\n'}
+[4.256223] (octomap_server) StdoutLine: {'line': b'[ 11%] \x1b[32mBuilding CXX object CMakeFiles/tracking_octomap_server_node.dir/rclcpp_components/node_main_tracking_octomap_server_node.cpp.o\x1b[0m\n'}
+[4.257737] (octomap_server) StdoutLine: {'line': b'[ 15%] \x1b[32mBuilding CXX object CMakeFiles/color_octomap_server_node.dir/rclcpp_components/node_main_color_octomap_server_node.cpp.o\x1b[0m\n'}
+[4.258167] (octomap_server) StdoutLine: {'line': b'[ 23%] \x1b[32mBuilding CXX object CMakeFiles/octomap_saver_node.dir/rclcpp_components/node_main_octomap_saver_node.cpp.o\x1b[0m\n'}
+[4.258333] (octomap_server) StdoutLine: {'line': b'[ 23%] \x1b[32mBuilding CXX object CMakeFiles/octomap_server_static.dir/src/octomap_server_static.cpp.o\x1b[0m\n'}
+[4.261015] (octomap_server) StdoutLine: {'line': b'[ 26%] \x1b[32mBuilding CXX object CMakeFiles/octomap_server_multilayer_node.dir/rclcpp_components/node_main_octomap_server_multilayer_node.cpp.o\x1b[0m\n'}
+[4.305597] (-) TimerEvent: {}
+[4.405795] (-) TimerEvent: {}
+[4.506027] (-) TimerEvent: {}
+[4.606266] (-) TimerEvent: {}
+[4.706508] (-) TimerEvent: {}
+[4.806759] (-) TimerEvent: {}
+[4.907004] (-) TimerEvent: {}
+[5.007242] (-) TimerEvent: {}
+[5.107480] (-) TimerEvent: {}
+[5.207724] (-) TimerEvent: {}
+[5.307979] (-) TimerEvent: {}
+[5.408224] (-) TimerEvent: {}
+[5.508472] (-) TimerEvent: {}
+[5.608734] (-) TimerEvent: {}
+[5.709001] (-) TimerEvent: {}
+[5.809228] (-) TimerEvent: {}
+[5.895481] (octomap_server) StdoutLine: {'line': b'[ 30%] \x1b[32m\x1b[1mLinking CXX executable custom_octomap_server_node\x1b[0m\n'}
+[5.906371] (octomap_server) StdoutLine: {'line': b'[ 34%] \x1b[32m\x1b[1mLinking CXX executable tracking_octomap_server_node\x1b[0m\n'}
+[5.909318] (-) TimerEvent: {}
+[5.912183] (octomap_server) StdoutLine: {'line': b'[ 38%] \x1b[32m\x1b[1mLinking CXX executable color_octomap_server_node\x1b[0m\n'}
+[5.974757] (octomap_server) StdoutLine: {'line': b'[ 42%] \x1b[32m\x1b[1mLinking CXX executable octomap_server_multilayer_node\x1b[0m\n'}
+[5.976302] (octomap_server) StdoutLine: {'line': b'[ 42%] Built target tracking_octomap_server_node\n'}
+[5.978271] (octomap_server) StdoutLine: {'line': b'[ 42%] Built target custom_octomap_server_node\n'}
+[5.987599] (octomap_server) StdoutLine: {'line': b'[ 42%] Built target color_octomap_server_node\n'}
+[6.009401] (-) TimerEvent: {}
+[6.039870] (octomap_server) StdoutLine: {'line': b'[ 46%] \x1b[32m\x1b[1mLinking CXX executable octomap_saver_node\x1b[0m\n'}
+[6.040035] (octomap_server) StdoutLine: {'line': b'[ 46%] Built target octomap_server_multilayer_node\n'}
+[6.101413] (octomap_server) StdoutLine: {'line': b'[ 46%] Built target octomap_saver_node\n'}
+[6.109473] (-) TimerEvent: {}
+[6.116387] (octomap_server) StdoutLine: {'line': b'[ 50%] \x1b[32m\x1b[1mLinking CXX executable octomap_server_static_node\x1b[0m\n'}
+[6.178255] (octomap_server) StdoutLine: {'line': b'[ 50%] Built target octomap_server_static_node\n'}
+[6.209561] (-) TimerEvent: {}
+[6.309751] (-) TimerEvent: {}
+[6.409932] (-) TimerEvent: {}
+[6.429448] (octomap_server) StdoutLine: {'line': b'[ 53%] \x1b[32m\x1b[1mLinking CXX shared library liboctomap_server_static.so\x1b[0m\n'}
+[6.510026] (-) TimerEvent: {}
+[6.610245] (-) TimerEvent: {}
+[6.710432] (-) TimerEvent: {}
+[6.771136] (octomap_server) StdoutLine: {'line': b'[ 53%] Built target octomap_server_static\n'}
+[6.785031] (octomap_server) StdoutLine: {'line': b'[ 57%] \x1b[32mBuilding CXX object CMakeFiles/octomap_server.dir/src/octomap_server.cpp.o\x1b[0m\n'}
+[6.810514] (-) TimerEvent: {}
+[6.910729] (-) TimerEvent: {}
+[7.010908] (-) TimerEvent: {}
+[7.111104] (-) TimerEvent: {}
+[7.211338] (-) TimerEvent: {}
+[7.311574] (-) TimerEvent: {}
+[7.411823] (-) TimerEvent: {}
+[7.512047] (-) TimerEvent: {}
+[7.612273] (-) TimerEvent: {}
+[7.712494] (-) TimerEvent: {}
+[7.812713] (-) TimerEvent: {}
+[7.912945] (-) TimerEvent: {}
+[8.013180] (-) TimerEvent: {}
+[8.113400] (-) TimerEvent: {}
+[8.213619] (-) TimerEvent: {}
+[8.313851] (-) TimerEvent: {}
+[8.414078] (-) TimerEvent: {}
+[8.514308] (-) TimerEvent: {}
+[8.614527] (-) TimerEvent: {}
+[8.714751] (-) TimerEvent: {}
+[8.814973] (-) TimerEvent: {}
+[8.915197] (-) TimerEvent: {}
+[9.015422] (-) TimerEvent: {}
+[9.115646] (-) TimerEvent: {}
+[9.215874] (-) TimerEvent: {}
+[9.316095] (-) TimerEvent: {}
+[9.416317] (-) TimerEvent: {}
+[9.516535] (-) TimerEvent: {}
+[9.616764] (-) TimerEvent: {}
+[9.716984] (-) TimerEvent: {}
+[9.817201] (-) TimerEvent: {}
+[9.917418] (-) TimerEvent: {}
+[10.017642] (-) TimerEvent: {}
+[10.117888] (-) TimerEvent: {}
+[10.218085] (-) TimerEvent: {}
+[10.318262] (-) TimerEvent: {}
+[10.418429] (-) TimerEvent: {}
+[10.518598] (-) TimerEvent: {}
+[10.618780] (-) TimerEvent: {}
+[10.718956] (-) TimerEvent: {}
+[10.819136] (-) TimerEvent: {}
+[10.919312] (-) TimerEvent: {}
+[11.019495] (-) TimerEvent: {}
+[11.119687] (-) TimerEvent: {}
+[11.219868] (-) TimerEvent: {}
+[11.320047] (-) TimerEvent: {}
+[11.420219] (-) TimerEvent: {}
+[11.520398] (-) TimerEvent: {}
+[11.620576] (-) TimerEvent: {}
+[11.720752] (-) TimerEvent: {}
+[11.820923] (-) TimerEvent: {}
+[11.921102] (-) TimerEvent: {}
+[12.021288] (-) TimerEvent: {}
+[12.121466] (-) TimerEvent: {}
+[12.221646] (-) TimerEvent: {}
+[12.321841] (-) TimerEvent: {}
+[12.422035] (-) TimerEvent: {}
+[12.522227] (-) TimerEvent: {}
+[12.622405] (-) TimerEvent: {}
+[12.722588] (-) TimerEvent: {}
+[12.822777] (-) TimerEvent: {}
+[12.922964] (-) TimerEvent: {}
+[13.023164] (-) TimerEvent: {}
+[13.123339] (-) TimerEvent: {}
+[13.223514] (-) TimerEvent: {}
+[13.323689] (-) TimerEvent: {}
+[13.423867] (-) TimerEvent: {}
+[13.524042] (-) TimerEvent: {}
+[13.624208] (-) TimerEvent: {}
+[13.724380] (-) TimerEvent: {}
+[13.824553] (-) TimerEvent: {}
+[13.924732] (-) TimerEvent: {}
+[14.024911] (-) TimerEvent: {}
+[14.125077] (-) TimerEvent: {}
+[14.225243] (-) TimerEvent: {}
+[14.325410] (-) TimerEvent: {}
+[14.425579] (-) TimerEvent: {}
+[14.525759] (-) TimerEvent: {}
+[14.625941] (-) TimerEvent: {}
+[14.726110] (-) TimerEvent: {}
+[14.826294] (-) TimerEvent: {}
+[14.926507] (-) TimerEvent: {}
+[15.026693] (-) TimerEvent: {}
+[15.126863] (-) TimerEvent: {}
+[15.227042] (-) TimerEvent: {}
+[15.327230] (-) TimerEvent: {}
+[15.427456] (-) TimerEvent: {}
+[15.527681] (-) TimerEvent: {}
+[15.627855] (-) TimerEvent: {}
+[15.728029] (-) TimerEvent: {}
+[15.828198] (-) TimerEvent: {}
+[15.928366] (-) TimerEvent: {}
+[16.028535] (-) TimerEvent: {}
+[16.128719] (-) TimerEvent: {}
+[16.228903] (-) TimerEvent: {}
+[16.329107] (-) TimerEvent: {}
+[16.429371] (-) TimerEvent: {}
+[16.529610] (-) TimerEvent: {}
+[16.629855] (-) TimerEvent: {}
+[16.647927] (octomap_server) StdoutLine: {'line': b'[ 61%] \x1b[32m\x1b[1mLinking CXX shared library liboctomap_server.so\x1b[0m\n'}
+[16.729950] (-) TimerEvent: {}
+[16.830161] (-) TimerEvent: {}
+[16.930333] (-) TimerEvent: {}
+[17.030510] (-) TimerEvent: {}
+[17.130700] (-) TimerEvent: {}
+[17.230911] (-) TimerEvent: {}
+[17.331082] (-) TimerEvent: {}
+[17.431294] (-) TimerEvent: {}
+[17.531581] (-) TimerEvent: {}
+[17.631943] (-) TimerEvent: {}
+[17.732512] (-) TimerEvent: {}
+[17.832764] (-) TimerEvent: {}
+[17.879652] (octomap_server) StdoutLine: {'line': b'[ 61%] Built target octomap_server\n'}
+[17.892790] (octomap_server) StdoutLine: {'line': b'[ 65%] \x1b[32mBuilding CXX object CMakeFiles/octomap_server_multilayer.dir/src/octomap_server.cpp.o\x1b[0m\n'}
+[17.895131] (octomap_server) StdoutLine: {'line': b'[ 69%] \x1b[32mBuilding CXX object CMakeFiles/octomap_server_multilayer.dir/src/octomap_server_multilayer.cpp.o\x1b[0m\n'}
+[17.932776] (-) TimerEvent: {}
+[18.032947] (-) TimerEvent: {}
+[18.133115] (-) TimerEvent: {}
+[18.233291] (-) TimerEvent: {}
+[18.333463] (-) TimerEvent: {}
+[18.433640] (-) TimerEvent: {}
+[18.533780] (-) TimerEvent: {}
+[18.633952] (-) TimerEvent: {}
+[18.734126] (-) TimerEvent: {}
+[18.834302] (-) TimerEvent: {}
+[18.934473] (-) TimerEvent: {}
+[19.034645] (-) TimerEvent: {}
+[19.134782] (-) TimerEvent: {}
+[19.234955] (-) TimerEvent: {}
+[19.335133] (-) TimerEvent: {}
+[19.435310] (-) TimerEvent: {}
+[19.535492] (-) TimerEvent: {}
+[19.635700] (-) TimerEvent: {}
+[19.735929] (-) TimerEvent: {}
+[19.836107] (-) TimerEvent: {}
+[19.936284] (-) TimerEvent: {}
+[20.036459] (-) TimerEvent: {}
+[20.136630] (-) TimerEvent: {}
+[20.236779] (-) TimerEvent: {}
+[20.336954] (-) TimerEvent: {}
+[20.437135] (-) TimerEvent: {}
+[20.537315] (-) TimerEvent: {}
+[20.637490] (-) TimerEvent: {}
+[20.737674] (-) TimerEvent: {}
+[20.837897] (-) TimerEvent: {}
+[20.938090] (-) TimerEvent: {}
+[21.038273] (-) TimerEvent: {}
+[21.138473] (-) TimerEvent: {}
+[21.238645] (-) TimerEvent: {}
+[21.338782] (-) TimerEvent: {}
+[21.438957] (-) TimerEvent: {}
+[21.539130] (-) TimerEvent: {}
+[21.639307] (-) TimerEvent: {}
+[21.739493] (-) TimerEvent: {}
+[21.839672] (-) TimerEvent: {}
+[21.939852] (-) TimerEvent: {}
+[22.040022] (-) TimerEvent: {}
+[22.140195] (-) TimerEvent: {}
+[22.240373] (-) TimerEvent: {}
+[22.340549] (-) TimerEvent: {}
+[22.440730] (-) TimerEvent: {}
+[22.540906] (-) TimerEvent: {}
+[22.641078] (-) TimerEvent: {}
+[22.741301] (-) TimerEvent: {}
+[22.841487] (-) TimerEvent: {}
+[22.941674] (-) TimerEvent: {}
+[23.041888] (-) TimerEvent: {}
+[23.142092] (-) TimerEvent: {}
+[23.241948] (octomap_server) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/octomap_server_multilayer.dir/build.make:76: CMakeFiles/octomap_server_multilayer.dir/src/octomap_server.cpp.o] Interrupt\n'}
+[23.242682] (-) TimerEvent: {}
+[23.242744] (octomap_server) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/octomap_server_multilayer.dir/build.make:90: CMakeFiles/octomap_server_multilayer.dir/src/octomap_server_multilayer.cpp.o] Interrupt\n'}
+[23.242822] (octomap_server) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:264: CMakeFiles/octomap_server_multilayer.dir/all] Interrupt\n'}
+[23.242861] (octomap_server) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Interrupt\n'}
+[23.278068] (octomap_server) CommandEnded: {'returncode': -2}
+[23.284961] (octomap_server) JobEnded: {'identifier': 'octomap_server', 'rc': 'SIGINT'}
+[23.295247] (octomap_mapping) JobSkipped: {'identifier': 'octomap_mapping'}
+[23.295299] (-) EventReactorShutdown: {}
