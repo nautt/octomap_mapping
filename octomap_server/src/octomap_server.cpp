@@ -671,19 +671,19 @@ bool OctomapServer::buildExternalOctree(
 
 void OctomapServer::runMesherPipeline()
 {
-  // 1. Convertir latest_cloud_ → PCL
-  // 2. Convertir PCL → Point3D
+  // 1. Convertir latest_cloud_ to PCL
+  // 2. Convertir PCL to Point3D
   // 3. Calcular bounding box
   // 4. Ejecutar mesher.generateMesh(...)
   // 5. Adaptar a octomap::OcTree
   // 6. Reemplazar octree_
   RCLCPP_INFO(get_logger(), "Executing runMesherPipeline...");
 
-  //1. Convertir latest_cloud_ → PCL
+  //1. Convertir latest_cloud_ to PCL
   PCLPointCloud pc;
   pcl::fromROSMsg(latest_cloud_, pc);
   
-  //2. Convertir PCL → Point3D
+  //2. Convertir PCL to Point3D
   std::vector<Clobscode::Point3D> point3d_cloud;
   point3d_cloud = PointCloudConverter::toPoint3D(pc);
   
@@ -707,7 +707,7 @@ void OctomapServer::runMesherPipeline()
   RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] Running mesher...");
   Clobscode::FEMesh outputMesh = mesher.generateMesh(point3d_cloud, ref_level, "external_octree", all_regions, bounds);
   Services::WriteVTK("external_octree", outputMesh);
-  RCLCPP_INFO(get_logger(), "[MESHER] Mesher finished");
+  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] Mesher finished");
   
   //5. Adaptar mesher a octomap::OcTree
   MesherOctreeAdapter<OcTreeT>::Params params;
@@ -716,16 +716,21 @@ void OctomapServer::runMesherPipeline()
   MesherOctreeAdapter<OcTreeT> adapter(
     mesher,
     outputMesh.getPoints(),          // MeshPoint vector
-    res_,                           // octomap resolution
+    //res_,                           // octomap resolution
+    0.7,
     params
   );
 
   RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] start buildOctomapTree with resolution %f...", res_);
   std::unique_ptr<OcTreeT> new_tree = adapter.buildOctomapTree();
+  if (new_tree) {
+    RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] buildOctomapTree finished, new tree has %zu nodes.", new_tree->size());
+    new_tree->writeBinary("external_octree.bt");
+  }
   RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] finished buildOctomapTree...");
   
   if (!new_tree) {
-    RCLCPP_ERROR(get_logger(), "[MESHER] Failed to build octomap tree");
+    RCLCPP_ERROR(get_logger(), "[octomap_server - runMesherPipeline] Failed to build octomap tree");
     return;
   }
     
@@ -733,7 +738,7 @@ void OctomapServer::runMesherPipeline()
   octree_.reset(new_tree.release());
   tree_depth_ = octree_->getTreeDepth();
   
-  RCLCPP_INFO(get_logger(), "[MESHER] External octree installed (depth=%lu, nodes=%zu)", tree_depth_, octree_->size());
+  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] External octree installed (depth=%lu, nodes=%zu)", tree_depth_, octree_->size());
   
 }
 
