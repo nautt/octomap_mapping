@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -708,6 +709,89 @@ void OctomapServer::runMesherPipeline()
   Clobscode::FEMesh outputMesh = mesher.generateMesh(point3d_cloud, ref_level, "external_octree", all_regions, bounds);
   Services::WriteVTK("external_octree", outputMesh);
   RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] Mesher finished");
+
+  // =========================================================
+  // DIAGNÓSTICO — verificar causas del bug de traducción
+  // =========================================================
+  {
+    const auto& mesh_pts = mesher.getMeshPoints();
+    const auto& fem_pts = outputMesh.getPoints();
+    RCLCPP_INFO(get_logger(), "[DIAG] mesher.getMeshPoints().size()  = %zu", mesh_pts.size());
+    RCLCPP_INFO(get_logger(), "[DIAG] outputMesh.getPoints().size()  = %zu", fem_pts.size());
+    RCLCPP_INFO(get_logger(), "[DIAG] res_ (debería usarse)          = %f", res_);
+    RCLCPP_INFO(get_logger(), "[DIAG] resolución hardcodeada actual  = 0.7");
+
+    // Primer octante ocupado: comparar centro calculado con ambos vectores
+    const auto& octants_diag = mesher.getOctants();
+    for (const auto& oct : octants_diag) {
+      if (oct.getContainedCloudPoints().empty()) continue;
+
+      const auto& idx = oct.getPoints();
+
+      // Centro usando getMeshPoints() — hipótesis: este es el correcto
+      const auto& mp0 = mesh_pts[idx[0]].getPoint();
+      const auto& mp6 = mesh_pts[idx[6]].getPoint();
+      RCLCPP_INFO(get_logger(),"[DIAG] 1er oct - centro via getMeshPoints:      (%.4f, %.4f, %.4f)", (mp0.X()+mp6.X())/2.0, (mp0.Y()+mp6.Y())/2.0, (mp0.Z()+mp6.Z())/2.0);
+
+      // Centro usando outputMesh.getPoints() — lo que usa el adaptador actualmente
+      if (idx[0] < fem_pts.size() && idx[6] < fem_pts.size()) {
+        const auto& fp0 = fem_pts[idx[0]];
+        const auto& fp6 = fem_pts[idx[6]];
+        RCLCPP_INFO(get_logger(),
+          "[DIAG] 1er oct - centro via outputMesh.getPoints: (%.4f, %.4f, %.4f)",
+          (fp0.X()+fp6.X())/2.0, (fp0.Y()+fp6.Y())/2.0, (fp0.Z()+fp6.Z())/2.0);
+      } else {
+        RCLCPP_WARN(get_logger(),
+          "[DIAG] INDICES FUERA DE RANGO en outputMesh.getPoints! "
+          "idx[0]=%u idx[6]=%u fem_pts.size=%zu  <-- CAUSA 1 CONFIRMADA",
+          idx[0], idx[6], fem_pts.size());
+      }
+      break; // solo necesitamos el primero
+    }
+
+    // Distribución de refinement levels entre octantes ocupados (Causa 3)
+    std::map<unsigned, unsigned> rl_counts;
+    unsigned occupied_total = 0;
+    for (const auto& oct : octants_diag) {
+      if (oct.getContainedCloudPoints().empty()) continue;
+      occupied_total++;
+      rl_counts[oct.getRefinementLevel()]++;
+    }
+    RCLCPP_INFO(get_logger(), "[DIAG] Total octantes ocupados: %u", occupied_total);
+    for (const auto& kv : rl_counts) {
+      RCLCPP_INFO(get_logger(),
+        "[DIAG]   RefinementLevel %u -> %u octantes", kv.first, kv.second);
+    }
+  }
+
+  // === DIAGNÓSTICO: tamaño físico de octantes ocupados ===
+  {
+    const auto& mesh_pts = mesher.getMeshPoints();
+    const auto& octants_diag = mesher.getOctants();
+    double min_size = std::numeric_limits<double>::max();
+    double max_size = 0.0;
+    double first_size = -1.0;
+    unsigned count = 0;
+    for (const auto& oct : octants_diag) {
+      if (oct.getContainedCloudPoints().empty()) continue;
+      const auto& idx = oct.getPoints();
+      const auto& p0 = mesh_pts[idx[0]].getPoint();
+      const auto& p6 = mesh_pts[idx[6]].getPoint();
+      // La arista del octante es la distancia entre p0 y p6 en cualquier eje
+      double edge = std::abs(p6.X() - p0.X());
+      if (first_size < 0.0) first_size = edge;
+      min_size = std::min(min_size, edge);
+      max_size = std::max(max_size, edge);
+      count++;
+    }
+    RCLCPP_INFO(get_logger(),
+      "[DIAG] Tamaño físico octantes ocupados: min=%.4f max=%.4f primer_oct=%.4f (n=%u)",
+      min_size, max_size, first_size, count);
+    RCLCPP_INFO(get_logger(),
+      "[DIAG] res_=%.4f  -> depth ideal = tree_depth - log2(edge/res_) = 16 - log2(%.4f/%.4f)",
+      res_, first_size, res_);
+  }
+  // =========================================================
   
   //5. Adaptar mesher a octomap::OcTree
   MesherOctreeAdapter<OcTreeT>::Params params;
@@ -715,9 +799,9 @@ void OctomapServer::runMesherPipeline()
   
   MesherOctreeAdapter<OcTreeT> adapter(
     mesher,
-    outputMesh.getPoints(),          // MeshPoint vector
-    //res_,                           // octomap resolution
-    0.7,
+    mesher.getMeshPoints(),          // MeshPoint vector
+    res_,                           // octomap resolution
+    //0.7,
     params
   );
 
@@ -832,6 +916,7 @@ void OctomapServer::insertScan(
   // non-lazy by default (updateInnerOccupancy() too slow for large maps)
   // octree_->updateInnerOccupancy();
   octomap::point3d min_pt, max_pt;
+  octree_->writeBinary("native_octomap.bt");
   RCLCPP_DEBUG_STREAM(
     get_logger(),
     "Bounding box keys (before): " << update_bbox_min_[0] << " " << update_bbox_min_[1] << " " <<
