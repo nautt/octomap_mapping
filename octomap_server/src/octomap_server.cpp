@@ -698,9 +698,29 @@ void OctomapServer::runMesherPipeline()
     
   //4. Ejecutar mesher.generateMesh(...)
   Clobscode::Mesher mesher;
-  unsigned short ref_level = max_tree_depth_;
-  unsigned short rl = 4;
+
+
+  double min_side = std::min({
+    maxPt.x - minPt.x,
+    maxPt.y - minPt.y,
+    maxPt.z - minPt.z
+  });
+  double initial_octant_edge = min_side * 1.01; // un poco más grande para asegurar que el octree cubre toda la nube, similar a lo que hacer gridMesher.cpp
+
+  unsigned short rl = static_cast<unsigned short>(
+      std::ceil(std::log2(initial_octant_edge / res_))
+  );
+  rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16)); //[1,16] es el rango de refinement levels soportados por el mesher.
+
+ 
+  //unsigned short rl = 4;
+  unsigned short ref_level = rl;
   
+  RCLCPP_INFO(get_logger(),
+      "[runMesherPipeline] min_side=%.3f initial_octant_edge=%.3f res_=%.4f -> rl=%u (edge final ≈ %.4f m)",
+      min_side, initial_octant_edge, res_, rl,
+      initial_octant_edge / std::pow(2.0, rl));
+
   list<Clobscode::RefinementRegion *> all_regions;
   all_regions.push_back(new RefinementAllRegion(rl));
   
@@ -719,7 +739,6 @@ void OctomapServer::runMesherPipeline()
     RCLCPP_INFO(get_logger(), "[DIAG] mesher.getMeshPoints().size()  = %zu", mesh_pts.size());
     RCLCPP_INFO(get_logger(), "[DIAG] outputMesh.getPoints().size()  = %zu", fem_pts.size());
     RCLCPP_INFO(get_logger(), "[DIAG] res_ (debería usarse)          = %f", res_);
-    RCLCPP_INFO(get_logger(), "[DIAG] resolución hardcodeada actual  = 0.7");
 
     // Primer octante ocupado: comparar centro calculado con ambos vectores
     const auto& octants_diag = mesher.getOctants();
@@ -728,24 +747,10 @@ void OctomapServer::runMesherPipeline()
 
       const auto& idx = oct.getPoints();
 
-      // Centro usando getMeshPoints() — hipótesis: este es el correcto
+      // Centro usando getMeshPoints()
       const auto& mp0 = mesh_pts[idx[0]].getPoint();
       const auto& mp6 = mesh_pts[idx[6]].getPoint();
       RCLCPP_INFO(get_logger(),"[DIAG] 1er oct - centro via getMeshPoints:      (%.4f, %.4f, %.4f)", (mp0.X()+mp6.X())/2.0, (mp0.Y()+mp6.Y())/2.0, (mp0.Z()+mp6.Z())/2.0);
-
-      // Centro usando outputMesh.getPoints() — lo que usa el adaptador actualmente
-      if (idx[0] < fem_pts.size() && idx[6] < fem_pts.size()) {
-        const auto& fp0 = fem_pts[idx[0]];
-        const auto& fp6 = fem_pts[idx[6]];
-        RCLCPP_INFO(get_logger(),
-          "[DIAG] 1er oct - centro via outputMesh.getPoints: (%.4f, %.4f, %.4f)",
-          (fp0.X()+fp6.X())/2.0, (fp0.Y()+fp6.Y())/2.0, (fp0.Z()+fp6.Z())/2.0);
-      } else {
-        RCLCPP_WARN(get_logger(),
-          "[DIAG] INDICES FUERA DE RANGO en outputMesh.getPoints! "
-          "idx[0]=%u idx[6]=%u fem_pts.size=%zu  <-- CAUSA 1 CONFIRMADA",
-          idx[0], idx[6], fem_pts.size());
-      }
       break; // solo necesitamos el primero
     }
 
