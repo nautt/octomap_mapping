@@ -435,11 +435,58 @@ bool OctomapServer::openFile(const std::string & filename)
 void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
 {
 
+  /*
   if (octree_builder_mode_ == OctreeBuilderMode::MESHER_EXTERNAL) {
     // Modo mesher: solo guardar snapshot de la nube y salir.
     RCLCPP_INFO(get_logger(), "Saving cloud snapshot for external mesher...");
     //std::lock_guard<std::mutex> lock(cloud_mutex_);
     latest_cloud_ = *cloud;
+    latest_cloud_stamp_ = cloud->header.stamp;
+    has_latest_pointcloud_ = true;
+    return;
+  }
+  */
+
+  if (octree_builder_mode_ == OctreeBuilderMode::MESHER_EXTERNAL) {
+    // 1. Lookup TF sensor -> world (igual que el modo nativo)
+    geometry_msgs::msg::TransformStamped sensor_to_world_tf;
+    try {
+      sensor_to_world_tf = tf2_buffer_->lookupTransform(
+        world_frame_id_, cloud->header.frame_id, cloud->header.stamp,
+        rclcpp::Duration::from_seconds(1.0));
+    } catch (const tf2::TransformException &ex) {
+      RCLCPP_WARN(get_logger(), "Mesher TF error: %s", ex.what());
+      return;
+    }
+
+    // 2. Convertir a PCL
+    PCLPointCloud pc;
+    pcl::fromROSMsg(*cloud, pc);
+
+    // 3. Filtrar NaNs y max_range_ en frame del sensor, igual que octomap nativo.
+    // max_range_ se aplica antes de transformar porque es una distancia relativa al sensor.
+    PCLPointCloud pc_filtered;
+    pc_filtered.header = pc.header;
+    for (const auto& pt: pc) {
+      if (!std::isfinite(pt.x) || !std::isfinite(pt.y) || !std::isfinite(pt.z)) // Si puntos invavalido
+        continue;
+      if (max_range_ > 0.0) {
+        double dist = std::sqrt(pt.x * pt.x + pt.y * pt.y + pt.z * pt.z);
+        if (dist > max_range_) // Si punto fuera de rango
+          continue;
+      }
+      pc_filtered.push_back(pt); // Push solo si el punto es valido y esta dentro del rango.
+    }
+    pc = pc_filtered;
+
+    // 4. Transformar la nube al frame del mundo antes de guardarla.
+    // Sin esto, el octree del mesher se construye en frame del sensor y rota/traslada junto a el.
+    pcl_ros::transformPointCloud(pc, pc, sensor_to_world_tf);
+
+    // 5. Guardar la nube ya transformada y en frame del mundo.
+    pcl::toROSMsg(pc, latest_cloud_);
+    latest_cloud_.header.frame_id = world_frame_id_;
+    latest_cloud_.header.stamp = cloud->header.stamp;
     latest_cloud_stamp_ = cloud->header.stamp;
     has_latest_pointcloud_ = true;
     return;
@@ -454,74 +501,6 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
   PCLPointCloud pc;  // input cloud for filtering and ground-detection
   pcl::fromROSMsg(*cloud, pc);
   
-  //----------------------------------------------------------------------------
-  // Pruebas Point3D
-  // for (PCLPointCloud::const_iterator it = pc.begin(); it != pc.end(); ++it) {
-    //   RCLCPP_INFO(this->get_logger(), "Punto: x=%.2f, y=%.2f, z=%.2f", it->x, it->y, it->z);
-    //   // octomap::point3d point(it->x, it->y, it->z);
-    // }
-    
-    /* 
-    // Comentado para pruebas modo mesher.
-    std::vector<Clobscode::Point3D> Point3DCloud;
-    Point3DCloud = PointCloudConverter::toPoint3D(pc);
-    
-    
-    // Bounding Box de nube de puntos para integracion con mesher_roi.
-    PCLPoint minPt, maxPt;
-    pcl::getMinMax3D(pc, minPt, maxPt);
-    std::vector<double> bounds = {
-      minPt.x, minPt.y, minPt.z,
-      maxPt.x, maxPt.y, maxPt.z
-    };
-    Clobscode::Mesher mesher;
-    unsigned short ref_level = max_tree_depth_, rl = 4;
-    list<Clobscode::RefinementRegion *> all_regions;
-    RefinementRegion *rr;
-    rr = new RefinementAllRegion(rl);
-    all_regions.push_back(rr);
-    
-    RCLCPP_INFO(this->get_logger(), "\nBounds:\n\tminPt:\t(%.2f, %.2f, %.2f)\n\tmaxPt:\t(%.2f, %.2f, %.2f)", minPt.x, minPt.y, minPt.z, maxPt.x, maxPt.y, maxPt.z);
-    
-    RCLCPP_INFO(this->get_logger(), "Before mesher");
-    Clobscode::FEMesh outputMesh = mesher.generateMesh(Point3DCloud, ref_level, "test", all_regions, bounds);
-    RCLCPP_INFO(this->get_logger(), "After mesher");
-    
-    Services::WriteVTK("octree",outputMesh);
-    //pcl::io::savePCDFileBinary("snapshot.pcd", cloud);
-    
-    // Comparar tamaños
-    //RCLCPP_INFO(this->get_logger(), "# PCLPointCloud: %lu\n# Point3D: %lu", pc.size(), Point3DCloud.size());
-    
-    // Comparar puntos individuales
-    for (size_t i = 0; i < pc.size(); ++i) {
-    const auto& pcl_point = pc[i];
-    const auto& point3d_point = Point3DCloud[i];
-    if (std::abs(pcl_point.x - point3d_point.X()) > 1e-6 ||
-    std::abs(pcl_point.y - point3d_point.Y()) > 1e-6 ||
-    std::abs(pcl_point.z - point3d_point.Z()) > 1e-6)
-    {
-      //RCLCPP_INFO(this->get_logger(), "\nMismatch: True\n# PCLPointCloud:\t(%.2f, %.2f, %.2f)\n# Point3D:\t(%.2f, %.2f, %.2f)", pcl_point.x, pcl_point.y, pcl_point.z, point3d_point.X(), point3d_point.Y(), point3d_point.Z());
-    } else {
-      //RCLCPP_INFO(this->get_logger(), "\nMismatch: False\n# PCLPointCloud:\t(%.2f, %.2f, %.2f)\n# Point3D:\t(%.2f, %.2f, %.2f)", pcl_point.x, pcl_point.y, pcl_point.z, point3d_point.X(), point3d_point.Y(), point3d_point.Z());
-    }
-  }
-  
-  // Tree Depth
-  // RCLCPP_INFO(this->get_logger(), "\nTree Depth: %lu\nMax Tree Depth: %lu", tree_depth_, max_tree_depth_);
-  
-  
-  
-  // for (const auto& it : Point3DCloud) {
-    //   RCLCPP_INFO(this->get_logger(), "Point3D: x=%.2f, y=%.2f, z=%.2f", it.X(), it.Y(), it.Z());
-    // }
-  */
-  //--------------------------------------------------------------------------
-
-
-
-
-
   geometry_msgs::msg::TransformStamped sensor_to_world_transform_stamped;
   try {
     sensor_to_world_transform_stamped = tf2_buffer_->lookupTransform(
@@ -596,50 +575,6 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
     pc_ground.header = pc.header;
     pc_nonground.header = pc.header;
   }
-
-  // MESHER INTEGRATION TEST-----------------------------------------------------------------
-    /*
-    // Mesher FEMesh generation for ground and nonground point clouds.
-    std::vector<Clobscode::Point3D> pc3d_ground;
-    pc3d_ground = PointCloudConverter::toPoint3D(pc_ground);
-    std::vector<Clobscode::Point3D> pc3d_nonground;
-    pc3d_nonground = PointCloudConverter::toPoint3D(pc_nonground);
-    
-    // Whole point cloud's bounding box for integration with mesher_roi.
-    PCLPoint minPt, maxPt;
-    pcl::getMinMax3D(pc, minPt, maxPt);
-    std::vector<double> bounds = {
-      minPt.x, minPt.y, minPt.z,
-      maxPt.x, maxPt.y, maxPt.z
-    };
-
-    Clobscode::Mesher mesher_ground, mesher_nonground;
-    list<Clobscode::RefinementRegion *> all_regions;
-    RefinementRegion *rr;
-    unsigned short ref_level = max_tree_depth_, rl = 16;
-    
-    //Refinement region that considers the entire point cloud.
-    rr = new RefinementAllRegion(rl);
-    all_regions.push_back(rr);
-    
-    //Comparar tamaños
-    RCLCPP_INFO(
-      this->get_logger(), 
-      "\nGround\n# PCLPointCloud: %lu\n# Point3D: %lu\nNonGround\n# PCLPointCloud: %lu\n# Point3D: %lu",
-      pc_ground.size(), pc3d_ground.size(), pc_nonground.size(), pc3d_nonground.size()
-    );
-    
-    Clobscode::FEMesh nonground_mesh = mesher_nonground.generateMesh(
-      pc3d_nonground,
-      ref_level,
-      "octree_nonground",
-      all_regions,
-      bounds
-    );
-    Services::WriteVTK("octree_nonground", nonground_mesh);
-    //PCLPointCloud nonground_pc_from_femesh = FEMeshToPCL::ToPCL<PCLPoint>(nonground_mesh);
-    */
-  //-----------------------------------------------------------------
 
   const auto & t = sensor_to_world_transform_stamped.transform.translation;
   tf2::Vector3 sensor_to_world_vec3{t.x, t.y, t.z};
