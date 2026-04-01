@@ -41,16 +41,13 @@
 #include <pcl/common/common.h>
 
 
-// Arreglar
-// #include "/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/mixedoctree/include/PointCloudConverter.hpp"
 #include "octomap_server/PointCloudConverter.hpp"
-// #include "/home/tom/ros2_workspaces/ros2_ws/src/octomap_mapping/mixedoctree/include/Point3D.h"
+#include "octomap_server/MetricsLogger.hpp"
 #include "mesher_roi/Point3D.h"
 #include <mesher_roi/Mesher.h>
 #include <mesher_roi/MesherOctreeAdapter.h>
 
-//Guardar archivo vtk
-#include <pcl/io/pcd_io.h>
+//#include <pcl/io/pcd_io.h>
 
 namespace
 {
@@ -78,7 +75,6 @@ OctomapServer::OctomapServer(const rclcpp::NodeOptions & node_options)
   using std::placeholders::_2;
 
   mode = this->declare_parameter<std::string>("map_builder", "octomap");
-  //this->get_parameter("map_builder", mode);
 
   RCLCPP_INFO(get_logger(), "map_builder: %s", mode.c_str());
 
@@ -435,20 +431,8 @@ bool OctomapServer::openFile(const std::string & filename)
 void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
 {
 
-  /*
   if (octree_builder_mode_ == OctreeBuilderMode::MESHER_EXTERNAL) {
-    // Modo mesher: solo guardar snapshot de la nube y salir.
-    RCLCPP_INFO(get_logger(), "Saving cloud snapshot for external mesher...");
-    //std::lock_guard<std::mutex> lock(cloud_mutex_);
-    latest_cloud_ = *cloud;
-    latest_cloud_stamp_ = cloud->header.stamp;
-    has_latest_pointcloud_ = true;
-    return;
-  }
-  */
-
-  if (octree_builder_mode_ == OctreeBuilderMode::MESHER_EXTERNAL) {
-    // 1. Lookup TF sensor -> world (igual que el modo nativo)
+    //Lookup TF sensor -> world (igual que el modo nativo, para evitar desincronizar con nube de puntos)
     geometry_msgs::msg::TransformStamped sensor_to_world_tf;
     try {
       sensor_to_world_tf = tf2_buffer_->lookupTransform(
@@ -459,31 +443,31 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
       return;
     }
 
-    // 2. Convertir a PCL
+    //Convertir a PCL
     PCLPointCloud pc;
     pcl::fromROSMsg(*cloud, pc);
 
-    // 3. Filtrar NaNs y max_range_ en frame del sensor, igual que octomap nativo.
-    // max_range_ se aplica antes de transformar porque es una distancia relativa al sensor.
+    //Filtrar NaNs y max_range_ en frame del sensor, igual que octomap nativo
+    //max_range_ se aplica antes de transformar porque es una distancia relativa al sensor
     PCLPointCloud pc_filtered;
     pc_filtered.header = pc.header;
     for (const auto& pt: pc) {
-      if (!std::isfinite(pt.x) || !std::isfinite(pt.y) || !std::isfinite(pt.z)) // Si puntos invavalido
+      if (!std::isfinite(pt.x) || !std::isfinite(pt.y) || !std::isfinite(pt.z))
         continue;
       if (max_range_ > 0.0) {
         double dist = std::sqrt(pt.x * pt.x + pt.y * pt.y + pt.z * pt.z);
-        if (dist > max_range_) // Si punto fuera de rango
+        if (dist > max_range_)
           continue;
       }
-      pc_filtered.push_back(pt); // Push solo si el punto es valido y esta dentro del rango.
+      pc_filtered.push_back(pt);
     }
     pc = pc_filtered;
 
-    // 4. Transformar la nube al frame del mundo antes de guardarla.
-    // Sin esto, el octree del mesher se construye en frame del sensor y rota/traslada junto a el.
+    //Transformar la nube al frame del mundo antes de guardarla.
+    //Sin esto, el octree del mesher se construye en frame del sensor y rota/traslada junto a el.
     pcl_ros::transformPointCloud(pc, pc, sensor_to_world_tf);
 
-    // 5. Guardar la nube ya transformada y en frame del mundo.
+    //Guardar la nube ya transformada y en frame del mundo.
     pcl::toROSMsg(pc, latest_cloud_);
     latest_cloud_.header.frame_id = world_frame_id_;
     latest_cloud_.header.stamp = cloud->header.stamp;
@@ -492,7 +476,7 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
     return;
   }
 
-  RCLCPP_INFO(get_logger(), "Starting octomap mode...");
+  //Timer para metricas
   const auto start_time = rclcpp::Clock{}.now();
 
   //
@@ -586,7 +570,6 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
     "Pointcloud insertion in OctomapServer done (%zu+%zu pts (ground/nonground), %f sec)",
     pc_ground.size(), pc_nonground.size(), total_elapsed);
 
-  RCLCPP_INFO(get_logger(), "Publishing external octomap...");
   publishAll(cloud->header.stamp);
 }
 
@@ -599,31 +582,24 @@ bool OctomapServer::buildExternalOctree(
         return false;
     }
     runMesherPipeline();
-    RCLCPP_INFO(get_logger(), "Publishing external octomap...");
     publishAll(latest_cloud_stamp_);
     RCLCPP_INFO(get_logger(), "External octomap published.");
     return true;
 }
 
+//Funcion unica para ejecutar el mesher y realizar pruebas
 void OctomapServer::runMesherPipeline()
 {
-  // 1. Convertir latest_cloud_ to PCL
-  // 2. Convertir PCL to Point3D
-  // 3. Calcular bounding box
-  // 4. Ejecutar mesher.generateMesh(...)
-  // 5. Adaptar a octomap::OcTree
-  // 6. Reemplazar octree_
-  RCLCPP_INFO(get_logger(), "Executing runMesherPipeline...");
 
-  //1. Convertir latest_cloud_ to PCL
+  //convertir latest_cloud_ to PCL
   PCLPointCloud pc;
   pcl::fromROSMsg(latest_cloud_, pc);
   
-  //2. Convertir PCL to Point3D
+  //convertir PCL to Point3D (formato mesher)
   std::vector<Clobscode::Point3D> point3d_cloud;
   point3d_cloud = PointCloudConverter::toPoint3D(pc);
   
-  //3. Calcular bounding box
+  //calcular bounding box de la nube de puntos.
   PCLPoint minPt, maxPt;
   pcl::getMinMax3D(pc, minPt, maxPt);
   std::vector<double> bounds = {
@@ -631,7 +607,7 @@ void OctomapServer::runMesherPipeline()
     maxPt.x, maxPt.y, maxPt.z
   };
     
-  //4. Ejecutar mesher.generateMesh(...)
+  //Set up para ejecutar mesher.generateMesh()
   Clobscode::Mesher mesher;
 
 
@@ -640,129 +616,76 @@ void OctomapServer::runMesherPipeline()
     maxPt.y - minPt.y,
     maxPt.z - minPt.z
   });
-  double initial_octant_edge = min_side * 1.01; // un poco más grande para asegurar que el octree cubre toda la nube, similar a lo que hacer gridMesher.cpp
+  double initial_octant_edge = min_side * 1.01; //un poco más grande para asegurar que el octree cubre toda la nube, lo mismo que se hace en gridMesher.cpp
 
+  //calcular refniement level
   unsigned short rl = static_cast<unsigned short>(
       std::ceil(std::log2(initial_octant_edge / res_))
   );
-  rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16)); //[1,16] es el rango de refinement levels soportados por el mesher.
+  rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16)); //[1,16] es el rango de refinement levels soportados por el mesher
 
- 
-  //unsigned short rl = 4;
-  unsigned short ref_level = rl;
-  
+
   RCLCPP_INFO(get_logger(),
       "[runMesherPipeline] min_side=%.3f initial_octant_edge=%.3f res_=%.4f -> rl=%u (edge final ≈ %.4f m)",
       min_side, initial_octant_edge, res_, rl,
       initial_octant_edge / std::pow(2.0, rl));
 
   list<Clobscode::RefinementRegion *> all_regions;
-  all_regions.push_back(new RefinementAllRegion(rl));
-  
-  //RCLCPP_INFO(this->get_logger(), "\nBounds:\n\tminPt:\t(%.2f, %.2f, %.2f)\n\tmaxPt:\t(%.2f, %.2f, %.2f)", minPt.x, minPt.y, minPt.z, maxPt.x, maxPt.y, maxPt.z);
-  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] Running mesher...");
-  Clobscode::FEMesh outputMesh = mesher.generateMesh(point3d_cloud, ref_level, "external_octree", all_regions, bounds);
+  all_regions.push_back(new RefinementAllRegion(rl)); //No se usa refinamiento adaptativo, posible mejora.
+                                                      //Octantes muy densos y homogeneos no deberian requerir
+                                                      //mas refinamiento, ya que no es necesario capturar mas detalle.
+                                                      //Octantes poco densos o heterogeneos implican detalles por lo que
+                                                      //requieren una resulucion mas fina para capturar dichos detalles.
+                                                      //Usar refinement regions para refinamiento adaptativo
+
+  RCLCPP_INFO(get_logger(), "Running mesher...");
+
+  auto mesher_t0 = rclcpp::Clock{}.now(); //Timer para metricas mesher
+  auto start_time = chrono::high_resolution_clock::now();
+  Clobscode::FEMesh outputMesh = mesher.generateMesh(point3d_cloud, rl, "external_octree", all_regions, bounds);
+  auto end_time = chrono::high_resolution_clock::now();
+  double mesher_time_ms = (rclcpp::Clock{}.now() - mesher_t0).seconds() * 1000.0; //fin timer
+
+  //guardar resultado para visualizacion, no se toma en timer
   Services::WriteVTK("external_octree", outputMesh);
-  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] Mesher finished");
+  RCLCPP_INFO(get_logger(), "Mesher finished (%.1f ms)", mesher_time_ms);
 
-  // =========================================================
-  // DIAGNÓSTICO — verificar causas del bug de traducción
-  // =========================================================
-  {
-    const auto& mesh_pts = mesher.getMeshPoints();
-    const auto& fem_pts = outputMesh.getPoints();
-    RCLCPP_INFO(get_logger(), "[DIAG] mesher.getMeshPoints().size()  = %zu", mesh_pts.size());
-    RCLCPP_INFO(get_logger(), "[DIAG] outputMesh.getPoints().size()  = %zu", fem_pts.size());
-    RCLCPP_INFO(get_logger(), "[DIAG] res_ (debería usarse)          = %f", res_);
+  //correr metricas para resultado del mesher
+  octomap_server::MetricsLogger::compute(
+    mesher, point3d_cloud, res_, mesher_time_ms,
+    dynamic_cast<const octomap::OcTree *>(octree_.get()));
 
-    // Primer octante ocupado: comparar centro calculado con ambos vectores
-    const auto& octants_diag = mesher.getOctants();
-    for (const auto& oct : octants_diag) {
-      if (oct.getContainedCloudPoints().empty()) continue;
-
-      const auto& idx = oct.getPoints();
-
-      // Centro usando getMeshPoints()
-      const auto& mp0 = mesh_pts[idx[0]].getPoint();
-      const auto& mp6 = mesh_pts[idx[6]].getPoint();
-      RCLCPP_INFO(get_logger(),"[DIAG] 1er oct - centro via getMeshPoints:      (%.4f, %.4f, %.4f)", (mp0.X()+mp6.X())/2.0, (mp0.Y()+mp6.Y())/2.0, (mp0.Z()+mp6.Z())/2.0);
-      break; // solo necesitamos el primero
-    }
-
-    // Distribución de refinement levels entre octantes ocupados (Causa 3)
-    std::map<unsigned, unsigned> rl_counts;
-    unsigned occupied_total = 0;
-    for (const auto& oct : octants_diag) {
-      if (oct.getContainedCloudPoints().empty()) continue;
-      occupied_total++;
-      rl_counts[oct.getRefinementLevel()]++;
-    }
-    RCLCPP_INFO(get_logger(), "[DIAG] Total octantes ocupados: %u", occupied_total);
-    for (const auto& kv : rl_counts) {
-      RCLCPP_INFO(get_logger(),
-        "[DIAG]   RefinementLevel %u -> %u octantes", kv.first, kv.second);
-    }
-  }
-
-  // === DIAGNÓSTICO: tamaño físico de octantes ocupados ===
-  {
-    const auto& mesh_pts = mesher.getMeshPoints();
-    const auto& octants_diag = mesher.getOctants();
-    double min_size = std::numeric_limits<double>::max();
-    double max_size = 0.0;
-    double first_size = -1.0;
-    unsigned count = 0;
-    for (const auto& oct : octants_diag) {
-      if (oct.getContainedCloudPoints().empty()) continue;
-      const auto& idx = oct.getPoints();
-      const auto& p0 = mesh_pts[idx[0]].getPoint();
-      const auto& p6 = mesh_pts[idx[6]].getPoint();
-      // La arista del octante es la distancia entre p0 y p6 en cualquier eje
-      double edge = std::abs(p6.X() - p0.X());
-      if (first_size < 0.0) first_size = edge;
-      min_size = std::min(min_size, edge);
-      max_size = std::max(max_size, edge);
-      count++;
-    }
-    RCLCPP_INFO(get_logger(),
-      "[DIAG] Tamaño físico octantes ocupados: min=%.4f max=%.4f primer_oct=%.4f (n=%u)",
-      min_size, max_size, first_size, count);
-    RCLCPP_INFO(get_logger(),
-      "[DIAG] res_=%.4f  -> depth ideal = tree_depth - log2(edge/res_) = 16 - log2(%.4f/%.4f)",
-      res_, first_size, res_);
-  }
-  // =========================================================
-  
-  //5. Adaptar mesher a octomap::OcTree
+  //Adaptar mesher a octomap::OcTree, este resulta ser redundante, puesto que la unica forma de visualizar
+  //el octree del mesher en octomap sin un rediseño considerable tanto de octomap como del mesher es
+  //obteniendo los centros de cada octante del mesher e insertando octantes en esas coordenadas aprox.
+  //en la estructura de octomap, lo que no es tan distinto a directamente pasarle la point cloud. Aunque
+  //tecnicamente deberian ser menos puntos
   MesherOctreeAdapter<OcTreeT>::Params params;
   params.occupied_logodds = octomap::logodds(0.97);
   
   MesherOctreeAdapter<OcTreeT> adapter(
     mesher,
-    mesher.getMeshPoints(),          // MeshPoint vector
-    res_,                           // octomap resolution
-    //0.7,
+    mesher.getMeshPoints(),
+    res_,                           // resolucion octomap
     params
   );
 
-  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] start buildOctomapTree with resolution %f...", res_);
   std::unique_ptr<OcTreeT> new_tree = adapter.buildOctomapTree();
   if (new_tree) {
-    RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] buildOctomapTree finished, new tree has %zu nodes.", new_tree->size());
     new_tree->writeBinary("external_octree.bt");
+    RCLCPP_INFO(get_logger(), "Adapter tree built: %zu nodes (resolution %.4f m)", new_tree->size(), res_);
   }
-  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] finished buildOctomapTree...");
   
   if (!new_tree) {
-    RCLCPP_ERROR(get_logger(), "[octomap_server - runMesherPipeline] Failed to build octomap tree");
+    RCLCPP_ERROR(get_logger(), "Failed to build octomap tree from mesher output");
     return;
   }
     
-  // 6. Reemplazar octree interno
+  //Reemplazar octree interno (se swapea)
   octree_.reset(new_tree.release());
   tree_depth_ = octree_->getTreeDepth();
   
-  RCLCPP_INFO(get_logger(), "[octomap_server - runMesherPipeline] External octree installed (depth=%lu, nodes=%zu)", tree_depth_, octree_->size());
+  RCLCPP_INFO(get_logger(), "External octree installed (depth=%lu, nodes=%zu)", tree_depth_, octree_->size());
   
 }
 
