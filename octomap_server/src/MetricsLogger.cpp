@@ -10,6 +10,7 @@
 
 namespace octomap_server {
 
+//Obtener metricas de mesher y escribirlas en json.
 static void writeMesherSection(
   std::ofstream & f,
   const Clobscode::Mesher & mesher,
@@ -45,8 +46,7 @@ static void writeMesherSection(
     }
   }
 
-  double coverage =
-    points.empty() ? 0.0 : static_cast<double>(covered_indices.size()) / points.size();
+  double coverage = points.empty() ? 0.0 : static_cast<double>(covered_indices.size()) / points.size();
   size_t memory_bytes = sizeof(Clobscode::Octant) * octants.size();
 
   f << "  \"mesher\": {\n";
@@ -70,14 +70,17 @@ static void writeMesherSection(
   f << "  }";
 }
 
+//Armar octree temporal sin raycast, calcular metricas y anotarlas en .json.
 static void writeOctomapStructuralSection(
   std::ofstream & f,
   const std::vector<Clobscode::Point3D> & points,
-  double resolution)
+  double resolution,
+  const std::string & bt_path)
 {
+  //generar octree temporal
   octomap::OcTree fresh_tree(resolution);
 
-  auto t0 = std::chrono::high_resolution_clock::now();
+  auto t0 = std::chrono::high_resolution_clock::now(); //timer start
   for (const auto & pt : points) {
     fresh_tree.updateNode(
       octomap::point3d(
@@ -87,7 +90,7 @@ static void writeOctomapStructuralSection(
       true);
   }
   fresh_tree.updateInnerOccupancy();
-  auto t1 = std::chrono::high_resolution_clock::now();
+  auto t1 = std::chrono::high_resolution_clock::now();//timer stop
   double time_ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
 
   size_t occupied_count = 0;
@@ -117,10 +120,17 @@ static void writeOctomapStructuralSection(
       ++covered;
     }
   }
-  double coverage =
-    points.empty() ? 0.0 : static_cast<double>(covered) / points.size();
+  double coverage = points.empty() ? 0.0 : static_cast<double>(covered) / points.size();
 
-  f << "  \"octomap_structural\": {\n";
+  const unsigned int tree_depth = fresh_tree.getTreeDepth();
+  std::vector<double> depth_to_edge(17, 0.0);
+  for (unsigned int d = 0; d <= tree_depth; ++d) {
+    depth_to_edge[d] = fresh_tree.getNodeSize(d);
+  }
+
+  fresh_tree.writeBinary(bt_path);
+
+  f << "  \"octomap_snapshot\": {\n";
   f << "    \"source\": \"fresh_single_scan_no_raycasting\",\n";
   f << "    \"time_ms\": " << time_ms << ",\n";
   f << "    \"occupied_element_count\": " << occupied_count << ",\n";
@@ -134,10 +144,17 @@ static void writeOctomapStructuralSection(
     f << depth_hist[i];
     if (i < 16) {f << ",";}
   }
+  f << "],\n";
+  f << "    \"depth_to_edge_m\": [";
+  for (int i = 0; i < 17; ++i) {
+    f << depth_to_edge[i];
+    if (i < 16) {f << ",";}
+  }
   f << "]\n";
   f << "  }";
 }
 
+//Obtener metricas de octree nativo de octomap y escribirlas en .json
 static void writeOctomapNativeSection(std::ofstream & f, const octomap::OcTree * tree)
 {
   size_t occupied_count = 0;
@@ -172,6 +189,7 @@ static void writeOctomapNativeSection(std::ofstream & f, const octomap::OcTree *
   f << "  }";
 }
 
+//mesher + octomap (no raycast)
 void MetricsLogger::compute(
   const Clobscode::Mesher & mesher,
   const std::vector<Clobscode::Point3D> & points,
@@ -187,14 +205,48 @@ void MetricsLogger::compute(
     return;
   }
 
+  std::string bt_path = output_path;
+  auto dot = bt_path.rfind('.');
+  if (dot != std::string::npos) {
+    bt_path = bt_path.substr(0, dot);
+  }
+  bt_path += ".bt";
+
   f << "{\n";
   writeMesherSection(f, mesher, points, mesher_time_ms);
   f << ",\n";
-  writeOctomapStructuralSection(f, points, resolution);
+  writeOctomapStructuralSection(f, points, resolution, bt_path);
   if (has_native) {
     f << ",\n";
     writeOctomapNativeSection(f, native_tree);
   }
+  f << "\n}\n";
+}
+
+//octomap nativo (raycast y origen)
+void MetricsLogger::computeNativeOnly(
+  const octomap::OcTree * native_tree,
+  const std::string & output_path)
+{
+  if (native_tree == nullptr || native_tree->size() == 0) {
+    return;
+  }
+
+  std::ofstream f(output_path);
+  if (!f.is_open()) {
+    return;
+  }
+
+  std::string bt_path = output_path;
+  auto dot = bt_path.rfind('.');
+  if (dot != std::string::npos) {
+    bt_path = bt_path.substr(0, dot);
+  }
+  bt_path += ".bt";
+  const_cast<octomap::OcTree *>(native_tree)->writeBinary(bt_path);
+
+  f << "{\n";
+  writeOctomapNativeSection(f, native_tree);
   f << "\n}\n";
 }
 

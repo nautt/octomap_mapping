@@ -75,6 +75,7 @@ OctomapServer::OctomapServer(const rclcpp::NodeOptions & node_options)
   using std::placeholders::_2;
 
   mode = this->declare_parameter<std::string>("map_builder", "octomap");
+  mesher_resolution_mode_ = this->declare_parameter<std::string>("mesher_resolution_mode", "dynamic");
 
   RCLCPP_INFO(get_logger(), "map_builder: %s", mode.c_str());
 
@@ -93,6 +94,20 @@ OctomapServer::OctomapServer(const rclcpp::NodeOptions & node_options)
         _1, _2));
     RCLCPP_INFO(get_logger(), "OctomapServer running in MESHER_EXTERNAL mode.");
   } else {
+    save_metrics_srv_ = this->create_service<std_srvs::srv::Empty>(
+      "save_native_metrics",
+      [this](
+        const std::shared_ptr<std_srvs::srv::Empty::Request>,
+        const std::shared_ptr<std_srvs::srv::Empty::Response>)
+      {
+        const auto * tree = dynamic_cast<const octomap::OcTree *>(octree_.get());
+        if (tree && tree->size() > 0) {
+          octomap_server::MetricsLogger::computeNativeOnly(tree, "metrics_octomap_incremental.json");
+          RCLCPP_INFO(get_logger(), "Native metrics saved to metrics.json");
+        } else {
+          RCLCPP_WARN(get_logger(), "No native OcTree available for metrics");
+        }
+      });
     RCLCPP_INFO(get_logger(), "OctomapServer running in OCTOMAP_NATIVE mode.");
   }
 
@@ -602,33 +617,43 @@ void OctomapServer::runMesherPipeline()
   //calcular bounding box de la nube de puntos.
   PCLPoint minPt, maxPt;
   pcl::getMinMax3D(pc, minPt, maxPt);
-  std::vector<double> bounds = {
-    minPt.x, minPt.y, minPt.z,
-    maxPt.x, maxPt.y, maxPt.z
-  };
-    
+
   //Set up para ejecutar mesher.generateMesh()
   Clobscode::Mesher mesher;
 
+  unsigned short rl;
+  std::vector<double> bounds;
 
-  double min_side = std::min({
-    maxPt.x - minPt.x,
-    maxPt.y - minPt.y,
-    maxPt.z - minPt.z
-  });
-  double initial_octant_edge = min_side * 1.01; //un poco más grande para asegurar que el octree cubre toda la nube, lo mismo que se hace en gridMesher.cpp
-
-  //calcular refniement level
-  unsigned short rl = static_cast<unsigned short>(
-      std::ceil(std::log2(initial_octant_edge / res_))
-  );
-  rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16)); //[1,16] es el rango de refinement levels soportados por el mesher
-
-
-  RCLCPP_INFO(get_logger(),
-      "[runMesherPipeline] min_side=%.3f initial_octant_edge=%.3f res_=%.4f -> rl=%u (edge final ≈ %.4f m)",
-      min_side, initial_octant_edge, res_, rl,
-      initial_octant_edge / std::pow(2.0, rl));
+  //Copia el bounding box y resolucion de octomap para generar hojas del mismo tamaño que octomap.
+  if (mesher_resolution_mode_ == "aligned") {
+    rl = 16;
+    double initial_octant_edge = res_ * std::pow(2.0, rl);
+    double bounds_half = (initial_octant_edge / 1.01) / 2.0;
+    double cx = (minPt.x + maxPt.x) / 2.0;
+    double cy = (minPt.y + maxPt.y) / 2.0;
+    double cz = (minPt.z + maxPt.z) / 2.0;
+    bounds = {cx - bounds_half, cy - bounds_half, cz - bounds_half,
+              cx + bounds_half, cy + bounds_half, cz + bounds_half};
+    RCLCPP_INFO(get_logger(),
+        "[runMesherPipeline] mode=aligned, rl=%u, initial_octant_edge=%.1f m, leaf_edge=%.4f m (= res_)",
+        rl, initial_octant_edge, res_);
+  } else {
+    //mesher_resolution_mode == dynamic (default): calcula rl a partir del tamaño de la nube y res_.
+    //la hoja resultante tiene edge ≈ min_side*1.01 / 2^rl, que generalmente difiere de res_, pero el
+    //arbol tiene menos niveles de refinamiento.
+    double min_side = std::min({
+      maxPt.x - minPt.x,
+      maxPt.y - minPt.y,
+      maxPt.z - minPt.z
+    });
+    double initial_octant_edge = min_side * 1.01;
+    rl = static_cast<unsigned short>(std::ceil(std::log2(initial_octant_edge / res_)));
+    rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16));
+    bounds = {minPt.x, minPt.y, minPt.z, maxPt.x, maxPt.y, maxPt.z};
+    RCLCPP_INFO(get_logger(),
+        "[runMesherPipeline] mode=dynamic, min_side=%.3f, rl=%u, leaf_edge ≈ %.4f m (res_=%.4f m)",
+        min_side, rl, initial_octant_edge / std::pow(2.0, rl), res_);
+  }
 
   list<Clobscode::RefinementRegion *> all_regions;
   all_regions.push_back(new RefinementAllRegion(rl)); //No se usa refinamiento adaptativo, posible mejora.
@@ -641,19 +666,18 @@ void OctomapServer::runMesherPipeline()
   RCLCPP_INFO(get_logger(), "Running mesher...");
 
   auto mesher_t0 = rclcpp::Clock{}.now(); //Timer para metricas mesher
-  auto start_time = chrono::high_resolution_clock::now();
   Clobscode::FEMesh outputMesh = mesher.generateMesh(point3d_cloud, rl, "external_octree", all_regions, bounds);
-  auto end_time = chrono::high_resolution_clock::now();
   double mesher_time_ms = (rclcpp::Clock{}.now() - mesher_t0).seconds() * 1000.0; //fin timer
 
   //guardar resultado para visualizacion, no se toma en timer
   Services::WriteVTK("external_octree", outputMesh);
   RCLCPP_INFO(get_logger(), "Mesher finished (%.1f ms)", mesher_time_ms);
 
-  //correr metricas para resultado del mesher
+  //correr metricas para resultado del mesher y un snapshot de un arbol temporal de octomap equivalente
   octomap_server::MetricsLogger::compute(
     mesher, point3d_cloud, res_, mesher_time_ms,
-    dynamic_cast<const octomap::OcTree *>(octree_.get()));
+    dynamic_cast<const octomap::OcTree *>(octree_.get()),
+  "metrics_mesher.json");
 
   //Adaptar mesher a octomap::OcTree, este resulta ser redundante, puesto que la unica forma de visualizar
   //el octree del mesher en octomap sin un rediseño considerable tanto de octomap como del mesher es

@@ -39,6 +39,17 @@ public:
     double mesher_time_ms,
     const octomap::OcTree * native_tree,
     const std::string & output_path = "metrics.json");
+
+  /**
+   * Write only the octomap_native section to a JSON file.
+   * Intended for OCTOMAP_NATIVE mode where no mesher is involved.
+   *
+   * @param native_tree  Pointer to the accumulated OcTree (must not be null).
+   * @param output_path  Destination path for metrics.json.
+   */
+  static void computeNativeOnly(
+    const octomap::OcTree * native_tree,
+    const std::string & output_path = "metrics.json");
 };
 
 }  // namespace octomap_server
