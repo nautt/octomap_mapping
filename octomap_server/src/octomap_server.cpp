@@ -45,6 +45,7 @@
 #include "octomap_server/MetricsLogger.hpp"
 #include "mesher_roi/Point3D.h"
 #include <mesher_roi/Mesher.h>
+#include <mesher_roi/LeanOctant.h>
 #include <mesher_roi/MesherOctreeAdapter.h>
 
 //#include <pcl/io/pcd_io.h>
@@ -673,11 +674,15 @@ void OctomapServer::runMesherPipeline()
   Services::WriteVTK("external_octree", outputMesh);
   RCLCPP_INFO(get_logger(), "Mesher finished (%.1f ms)", mesher_time_ms);
 
+  //Convertir Octants a LeanOctants (reduce ~208B → ~64B por octante, eliminando campos TriMesh)
+  auto lean_octants = Clobscode::toLeanOctants(mesher.getOctants());
+
   //correr metricas para resultado del mesher y un snapshot de un arbol temporal de octomap equivalente
   octomap_server::MetricsLogger::compute(
-    mesher, point3d_cloud, res_, mesher_time_ms,
+    lean_octants, mesher.getMeshPoints(), point3d_cloud,
+    res_, mesher_time_ms,
     dynamic_cast<const octomap::OcTree *>(octree_.get()),
-  "metrics_mesher.json");
+    "metrics_mesher.json");
 
   //Adaptar mesher a octomap::OcTree, este resulta ser redundante, puesto que la unica forma de visualizar
   //el octree del mesher en octomap sin un rediseño considerable tanto de octomap como del mesher es
@@ -686,9 +691,9 @@ void OctomapServer::runMesherPipeline()
   //tecnicamente deberian ser menos puntos
   MesherOctreeAdapter<OcTreeT>::Params params;
   params.occupied_logodds = octomap::logodds(0.97);
-  
+
   MesherOctreeAdapter<OcTreeT> adapter(
-    mesher,
+    lean_octants,
     mesher.getMeshPoints(),
     res_,                           // resolucion octomap
     params

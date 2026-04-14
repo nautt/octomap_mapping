@@ -13,12 +13,11 @@ namespace octomap_server {
 //Obtener metricas de mesher y escribirlas en json.
 static void writeMesherSection(
   std::ofstream & f,
-  const Clobscode::Mesher & mesher,
-  const std::vector<Clobscode::Point3D> & points,
+  const std::vector<Clobscode::LeanOctant> & octants,
+  const std::vector<Clobscode::MeshPoint> & mesh_points,
+  const std::vector<Clobscode::Point3D> & cloud_points,
   double mesher_time_ms)
 {
-  const auto & octants = mesher.getOctants();
-  const auto & mesh_points = mesher.getMeshPoints();
 
   size_t occupied_count = 0;
   std::unordered_set<unsigned int> covered_indices;
@@ -46,8 +45,8 @@ static void writeMesherSection(
     }
   }
 
-  double coverage = points.empty() ? 0.0 : static_cast<double>(covered_indices.size()) / points.size();
-  size_t memory_bytes = sizeof(Clobscode::Octant) * octants.size();
+  double coverage = cloud_points.empty() ? 0.0 : static_cast<double>(covered_indices.size()) / cloud_points.size();
+  size_t memory_bytes = sizeof(Clobscode::LeanOctant) * octants.size();
 
   f << "  \"mesher\": {\n";
   f << "    \"time_ms\": " << mesher_time_ms << ",\n";
@@ -191,8 +190,9 @@ static void writeOctomapNativeSection(std::ofstream & f, const octomap::OcTree *
 
 //mesher + octomap (no raycast)
 void MetricsLogger::compute(
-  const Clobscode::Mesher & mesher,
-  const std::vector<Clobscode::Point3D> & points,
+  const std::vector<Clobscode::LeanOctant> & octants,
+  const std::vector<Clobscode::MeshPoint> & mesh_points,
+  const std::vector<Clobscode::Point3D> & cloud_points,
   double resolution,
   double mesher_time_ms,
   const octomap::OcTree * native_tree,
@@ -213,9 +213,9 @@ void MetricsLogger::compute(
   bt_path += ".bt";
 
   f << "{\n";
-  writeMesherSection(f, mesher, points, mesher_time_ms);
+  writeMesherSection(f, octants, mesh_points, cloud_points, mesher_time_ms);
   f << ",\n";
-  writeOctomapStructuralSection(f, points, resolution, bt_path);
+  writeOctomapStructuralSection(f, cloud_points, resolution, bt_path);
   if (has_native) {
     f << ",\n";
     writeOctomapNativeSection(f, native_tree);

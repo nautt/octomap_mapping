@@ -1,7 +1,8 @@
 #ifndef OCTOMAP_SERVER_METRICS_LOGGER_HPP
 #define OCTOMAP_SERVER_METRICS_LOGGER_HPP
 
-#include <mesher_roi/Mesher.h>
+#include <mesher_roi/LeanOctant.h>
+#include <mesher_roi/MeshPoint.h>
 #include <mesher_roi/Point3D.h>
 #include <octomap/octomap.h>
 
@@ -24,8 +25,9 @@ namespace octomap_server {
 class MetricsLogger {
 public:
   /**
-   * @param mesher          The Clobscode mesher after generateMesh() has returned.
-   * @param points          The Point3D cloud passed to generateMesh().
+   * @param octants         LeanOctant vector converted from mesher output after generateMesh().
+   * @param mesh_points     The mesher's MeshPoint vector (for geometry: corner coordinates).
+   * @param cloud_points    The Point3D cloud passed to generateMesh().
    * @param resolution      OctoMap resolution in metres (res_ from OctomapServer).
    * @param mesher_time_ms  Wall-clock time of the generateMesh() call in milliseconds.
    * @param native_tree     Pointer to the accumulated OcTree (octree_.get()); may be null
@@ -33,8 +35,9 @@ public:
    * @param output_path     Destination path for metrics.json.
    */
   static void compute(
-    const Clobscode::Mesher & mesher,
-    const std::vector<Clobscode::Point3D> & points,
+    const std::vector<Clobscode::LeanOctant> & octants,
+    const std::vector<Clobscode::MeshPoint> & mesh_points,
+    const std::vector<Clobscode::Point3D> & cloud_points,
     double resolution,
     double mesher_time_ms,
     const octomap::OcTree * native_tree,
