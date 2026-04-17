@@ -627,16 +627,20 @@ void OctomapServer::runMesherPipeline()
 
   //Copia el bounding box y resolucion de octomap para generar hojas del mismo tamaño que octomap.
   if (mesher_resolution_mode_ == "aligned") {
+    // La grilla se centra en el origen (0,0,0) — mismo origen que OctoMap — para que los bordes de
+    // las hojas coincidan exactamente con los bordes de los voxels de OctoMap (multiplos de res_).
+    // Centrar en el centroide de la nube introduciria un desfase de (centroid mod res_) que hace que
+    // los puntos cerca de un borde caigan en celdas distintas en ambos sistemas (fuente del gap).
+    // El factor /1.01 compensa el step*=1.01 interno de GridMesher (src/GridMesher.cpp:61), que
+    // agranda el lado minimo de la grilla un 1% para evitar que puntos exactamente en el borde queden
+    // fuera. Sin la compensacion el lado de la hoja resultante seria res_*1.01 en lugar de res_.
     rl = 16;
-    double initial_octant_edge = res_ * std::pow(2.0, rl);
+    double initial_octant_edge = res_ * std::pow(2.0, rl);  // = res_ * 2^16 (hoja = res_ si GridMesher aplica *1.01)
     double bounds_half = (initial_octant_edge / 1.01) / 2.0;
-    double cx = (minPt.x + maxPt.x) / 2.0;
-    double cy = (minPt.y + maxPt.y) / 2.0;
-    double cz = (minPt.z + maxPt.z) / 2.0;
-    bounds = {cx - bounds_half, cy - bounds_half, cz - bounds_half,
-              cx + bounds_half, cy + bounds_half, cz + bounds_half};
+    bounds = {-bounds_half, -bounds_half, -bounds_half,
+              bounds_half, bounds_half, bounds_half};
     RCLCPP_INFO(get_logger(),
-        "[runMesherPipeline] mode=aligned, rl=%u, initial_octant_edge=%.1f m, leaf_edge=%.4f m (= res_)",
+        "[runMesherPipeline] mode=aligned, rl=%u, grid_side=%.1f m, leaf_edge=%.4f m (= res_)",
         rl, initial_octant_edge, res_);
   } else {
     //mesher_resolution_mode == dynamic (default): calcula rl a partir del tamaño de la nube y res_.
@@ -650,7 +654,12 @@ void OctomapServer::runMesherPipeline()
     double initial_octant_edge = min_side * 1.01;
     rl = static_cast<unsigned short>(std::ceil(std::log2(initial_octant_edge / res_)));
     rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16));
-    bounds = {minPt.x, minPt.y, minPt.z, maxPt.x, maxPt.y, maxPt.z};
+    // Se extiende el borde en res_/2 para que ningun punto de la nube quede exactamente
+    // sobre la cara exterior de la grilla. containsPoint() usa intervalo semiabierto [pmin, pmax),
+    // por lo que los puntos con coordenada maxima fallarian el test en todas las hojas.
+    double margin = res_ * 0.5;
+    bounds = {minPt.x - margin, minPt.y - margin, minPt.z - margin,
+              maxPt.x + margin, maxPt.y + margin, maxPt.z + margin};
     RCLCPP_INFO(get_logger(),
         "[runMesherPipeline] mode=dynamic, min_side=%.3f, rl=%u, leaf_edge ≈ %.4f m (res_=%.4f m)",
         min_side, rl, initial_octant_edge / std::pow(2.0, rl), res_);
@@ -671,17 +680,20 @@ void OctomapServer::runMesherPipeline()
   double mesher_time_ms = (rclcpp::Clock{}.now() - mesher_t0).seconds() * 1000.0; //fin timer
 
   //guardar resultado para visualizacion, no se toma en timer
-  Services::WriteVTK("external_octree", outputMesh);
+  Services::WriteVTK("metrics_mesher", outputMesh);
   RCLCPP_INFO(get_logger(), "Mesher finished (%.1f ms)", mesher_time_ms);
 
   //Convertir Octants a LeanOctants (reduce ~208B → ~64B por octante, eliminando campos TriMesh)
   auto lean_octants = Clobscode::toLeanOctants(mesher.getOctants());
 
-  //correr metricas para resultado del mesher y un snapshot de un arbol temporal de octomap equivalente
+  //correr metricas para resultado del mesher y un snapshot de un arbol temporal de octomap equivalente.
+  //Se pasa nullptr como native_tree porque en modo MESHER_EXTERNAL octree_ contiene el resultado del
+  //adapter de la ejecucion anterior, no un arbol nativo con raycast. Las metricas nativas se obtienen
+  //por separado con computeNativeOnly() en modo OCTOMAP_NATIVE.
   octomap_server::MetricsLogger::compute(
     lean_octants, mesher.getMeshPoints(), point3d_cloud,
     res_, mesher_time_ms,
-    dynamic_cast<const octomap::OcTree *>(octree_.get()),
+    nullptr,
     "metrics_mesher.json");
 
   //Adaptar mesher a octomap::OcTree, este resulta ser redundante, puesto que la unica forma de visualizar
