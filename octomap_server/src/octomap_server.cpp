@@ -643,26 +643,42 @@ void OctomapServer::runMesherPipeline()
         "[runMesherPipeline] mode=aligned, rl=%u, grid_side=%.1f m, leaf_edge=%.4f m (= res_)",
         rl, initial_octant_edge, res_);
   } else {
-    //mesher_resolution_mode == dynamic (default): calcula rl a partir del tamaño de la nube y res_.
-    //la hoja resultante tiene edge ≈ min_side*1.01 / 2^rl, que generalmente difiere de res_, pero el
-    //arbol tiene menos niveles de refinamiento.
-    double min_side = std::min({
-      maxPt.x - minPt.x,
-      maxPt.y - minPt.y,
-      maxPt.z - minPt.z
-    });
-    double initial_octant_edge = min_side * 1.01;
-    rl = static_cast<unsigned short>(std::ceil(std::log2(initial_octant_edge / res_)));
+    // mesher_resolution_mode == dynamic (mejorado): calcula rl para que la hoja tenga exactamente
+    // res_, igual que en modo aligned, pero ajusta el tamaño de la grilla al bounding box de la nube.
+    //
+    // La grilla se centra en el multiplo de res_ mas cercano al centroide del bounding box, de modo
+    // que los bordes de las hojas coincidan con los voxels de OcToMap (multiplos de res_ desde el
+    // origen). Se usa un solo octante raiz cubico (mismo enfoque que modo aligned) en lugar de una
+    // grilla de octantes raiz como en la version anterior.
+    //
+    // El factor /1.01 en bounds_half compensa el step*=1.01 de GridMesher (GridMesher.cpp:61),
+    // igual que en modo aligned, para que la hoja resultante sea exactamente res_.
+
+    // Centroide del bounding box, ajustado al multiplo de res_ mas cercano en cada eje.
+    double cx_snap = std::round(((maxPt.x + minPt.x) / 2.0) / res_) * res_;
+    double cy_snap = std::round(((maxPt.y + minPt.y) / 2.0) / res_) * res_;
+    double cz_snap = std::round(((maxPt.z + minPt.z) / 2.0) / res_) * res_;
+
+    // Distancia maxima desde el centro ajustado a cualquier vertice del bounding box, mas margen
+    // de res_/2 para que ningun punto caiga en la cara exterior (intervalo semiabierto [pmin,pmax)).
+    double max_half = std::max({
+        std::abs(maxPt.x - cx_snap), std::abs(minPt.x - cx_snap),
+        std::abs(maxPt.y - cy_snap), std::abs(minPt.y - cy_snap),
+        std::abs(maxPt.z - cz_snap), std::abs(minPt.z - cz_snap)
+    }) + res_ * 0.5;
+
+    // rl minimo tal que el octante raiz (lado = res_*2^rl) cubra max_half en cada eje.
+    rl = static_cast<unsigned short>(std::ceil(std::log2(2.0 * max_half / res_)));
     rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16));
-    // Se extiende el borde en res_/2 para que ningun punto de la nube quede exactamente
-    // sobre la cara exterior de la grilla. containsPoint() usa intervalo semiabierto [pmin, pmax),
-    // por lo que los puntos con coordenada maxima fallarian el test en todas las hojas.
-    double margin = res_ * 0.5;
-    bounds = {minPt.x - margin, minPt.y - margin, minPt.z - margin,
-              maxPt.x + margin, maxPt.y + margin, maxPt.z + margin};
+
+    // Bounds cubicos centrados en el centro ajustado. El /1.01 compensa el step*=1.01 de GridMesher.
+    double bounds_half = (res_ * std::pow(2.0, rl) / 1.01) / 2.0;
+    bounds = {
+        cx_snap - bounds_half, cy_snap - bounds_half, cz_snap - bounds_half,
+        cx_snap + bounds_half, cy_snap + bounds_half, cz_snap + bounds_half};
     RCLCPP_INFO(get_logger(),
-        "[runMesherPipeline] mode=dynamic, min_side=%.3f, rl=%u, leaf_edge ≈ %.4f m (res_=%.4f m)",
-        min_side, rl, initial_octant_edge / std::pow(2.0, rl), res_);
+        "[runMesherPipeline] mode=dynamic, center=(%.2f,%.2f,%.2f), rl=%u, leaf_edge=%.4f m (= res_)",
+        cx_snap, cy_snap, cz_snap, rl, res_);
   }
 
   list<Clobscode::RefinementRegion *> all_regions;
