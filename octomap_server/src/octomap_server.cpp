@@ -627,15 +627,15 @@ void OctomapServer::runMesherPipeline()
 
   //Copia el bounding box y resolucion de octomap para generar hojas del mismo tamaño que octomap.
   if (mesher_resolution_mode_ == "aligned") {
-    // La grilla se centra en el origen (0,0,0) — mismo origen que OctoMap — para que los bordes de
-    // las hojas coincidan exactamente con los bordes de los voxels de OctoMap (multiplos de res_).
-    // Centrar en el centroide de la nube introduciria un desfase de (centroid mod res_) que hace que
-    // los puntos cerca de un borde caigan en celdas distintas en ambos sistemas (fuente del gap).
-    // El factor /1.01 compensa el step*=1.01 interno de GridMesher (src/GridMesher.cpp:61), que
-    // agranda el lado minimo de la grilla un 1% para evitar que puntos exactamente en el borde queden
-    // fuera. Sin la compensacion el lado de la hoja resultante seria res_*1.01 en lugar de res_.
+    // La grilla se centra en el origen (0,0,0), mismo origen que OctoMap, para que los bordes de
+    // las hojas coincidan exactamente con los bordes de los voxels de OctoMap (y así sean multiplos de res_),
+    // ya que centrar el mesher en el centro de la nube introduciria un desfase que hace que los puntos cerca de
+    // un borde caigan en celdas distintas en ambos sistemas.
+    // El factor /1.01 compensa el step*=1.01 interno de GridMesher, que agranda el lado minimo de la grilla un 1%
+    // para evitar que puntos exactamente en el borde queden fuera. Sin la compensacion el lado de la hoja
+    // resultante seria res_*1.01 en lugar de res_.
     rl = 16;
-    double initial_octant_edge = res_ * std::pow(2.0, rl);  // = res_ * 2^16 (hoja = res_ si GridMesher aplica *1.01)
+    double initial_octant_edge = res_ * std::pow(2.0, rl);
     double bounds_half = (initial_octant_edge / 1.01) / 2.0;
     bounds = {-bounds_half, -bounds_half, -bounds_half,
               bounds_half, bounds_half, bounds_half};
@@ -643,16 +643,13 @@ void OctomapServer::runMesherPipeline()
         "[runMesherPipeline] mode=aligned, rl=%u, grid_side=%.1f m, leaf_edge=%.4f m (= res_)",
         rl, initial_octant_edge, res_);
   } else {
-    // mesher_resolution_mode == dynamic (mejorado): calcula rl para que la hoja tenga exactamente
-    // res_, igual que en modo aligned, pero ajusta el tamaño de la grilla al bounding box de la nube.
-    //
-    // La grilla se centra en el multiplo de res_ mas cercano al centroide del bounding box, de modo
+    // mesher_resolution_mode == dynamic: calcula rl para que la hoja tenga exactamente tamaño res_ al igual que
+    // en modo aligned. Empezando desde hojas de tamaño res_, trata de ajustar el tamaño de la grilla al bounding
+    // box de la nube para evitar niveles de refinamiento innecesarios o de sobra.
+    // La grilla se centra en el multiplo de res_ mas cercano al centro del bounding box, de modo
     // que los bordes de las hojas coincidan con los voxels de OcToMap (multiplos de res_ desde el
     // origen). Se usa un solo octante raiz cubico (mismo enfoque que modo aligned) en lugar de una
-    // grilla de octantes raiz como en la version anterior.
-    //
-    // El factor /1.01 en bounds_half compensa el step*=1.01 de GridMesher (GridMesher.cpp:61),
-    // igual que en modo aligned, para que la hoja resultante sea exactamente res_.
+    // grilla de octantes raiz como en mesher nativo.
 
     // Centroide del bounding box, ajustado al multiplo de res_ mas cercano en cada eje.
     double cx_snap = std::round(((maxPt.x + minPt.x) / 2.0) / res_) * res_;
@@ -671,7 +668,8 @@ void OctomapServer::runMesherPipeline()
     rl = static_cast<unsigned short>(std::ceil(std::log2(2.0 * max_half / res_)));
     rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16));
 
-    // Bounds cubicos centrados en el centro ajustado. El /1.01 compensa el step*=1.01 de GridMesher.
+    // Bounds cubicos centrados en el centro ajustado. El /1.01 compensa el step*=1.01 de GridMesher para que
+    // la hoja sea exactamente de tamaño res_.
     double bounds_half = (res_ * std::pow(2.0, rl) / 1.01) / 2.0;
     bounds = {
         cx_snap - bounds_half, cy_snap - bounds_half, cz_snap - bounds_half,
@@ -682,41 +680,41 @@ void OctomapServer::runMesherPipeline()
   }
 
   list<Clobscode::RefinementRegion *> all_regions;
-  all_regions.push_back(new RefinementAllRegion(rl)); //No se usa refinamiento adaptativo, posible mejora.
-                                                      //Octantes muy densos y homogeneos no deberian requerir
-                                                      //mas refinamiento, ya que no es necesario capturar mas detalle.
-                                                      //Octantes poco densos o heterogeneos implican detalles por lo que
-                                                      //requieren una resulucion mas fina para capturar dichos detalles.
-                                                      //Usar refinement regions para refinamiento adaptativo
+  all_regions.push_back(new RefinementAllRegion(rl)); // No se usa refinamiento adaptativo, posible mejora.
+                                                      // Octantes muy densos y homogeneos no deberian requerir
+                                                      // mas refinamiento, ya que no es necesario capturar mas detalle.
+                                                      // Octantes poco densos o heterogeneos implican detalles por lo que
+                                                      // requieren una resulucion mas fina para capturar dichos detalles.
+                                                      // Usar refinement regions para refinamiento adaptativo
 
   RCLCPP_INFO(get_logger(), "Running mesher...");
 
-  auto mesher_t0 = rclcpp::Clock{}.now(); //Timer para metricas mesher
+  auto mesher_t0 = rclcpp::Clock{}.now(); // Timer para metricas mesher
   Clobscode::FEMesh outputMesh = mesher.generateMesh(point3d_cloud, rl, "external_octree", all_regions, bounds);
   double mesher_time_ms = (rclcpp::Clock{}.now() - mesher_t0).seconds() * 1000.0; //fin timer
 
-  //guardar resultado para visualizacion, no se toma en timer
+  // guardar resultado para visualizacion, no se toma en timer
   Services::WriteVTK("metrics_mesher", outputMesh);
   RCLCPP_INFO(get_logger(), "Mesher finished (%.1f ms)", mesher_time_ms);
 
-  //Convertir Octants a LeanOctants (reduce ~208B → ~64B por octante, eliminando campos TriMesh)
+  // Convertir Octants a LeanOctants para ahorrar memoria.
   auto lean_octants = Clobscode::toLeanOctants(mesher.getOctants());
 
-  //correr metricas para resultado del mesher y un snapshot de un arbol temporal de octomap equivalente.
-  //Se pasa nullptr como native_tree porque en modo MESHER_EXTERNAL octree_ contiene el resultado del
-  //adapter de la ejecucion anterior, no un arbol nativo con raycast. Las metricas nativas se obtienen
-  //por separado con computeNativeOnly() en modo OCTOMAP_NATIVE.
+  // Correr metricas para resultado del mesher y un snapshot de un arbol temporal de octomap equivalente.
+  // Se pasa nullptr como native_tree porque en modo MESHER_EXTERNAL octree_ contiene el resultado del
+  // adapter de la ejecucion anterior, no un arbol nativo con raycast.
+  // Las metricas nativas se obtienen por separado con computeNativeOnly() en modo OCTOMAP_NATIVE.
   octomap_server::MetricsLogger::compute(
     lean_octants, mesher.getMeshPoints(), point3d_cloud,
     res_, mesher_time_ms,
     nullptr,
     "metrics_mesher.json");
 
-  //Adaptar mesher a octomap::OcTree, este resulta ser redundante, puesto que la unica forma de visualizar
-  //el octree del mesher en octomap sin un rediseño considerable tanto de octomap como del mesher es
-  //obteniendo los centros de cada octante del mesher e insertando octantes en esas coordenadas aprox.
-  //en la estructura de octomap, lo que no es tan distinto a directamente pasarle la point cloud. Aunque
-  //tecnicamente deberian ser menos puntos
+  // Adaptar mesher a octomap::OcTree, este resulta ser redundante, puesto que la unica forma de visualizar
+  // el octree del mesher en octomap sin un rediseño considerable tanto de octomap como del mesher es
+  // obteniendo los centros de cada octante del mesher e insertando octantes en esas coordenadas aprox.
+  // en la estructura de octomap, lo que no es tan distinto a directamente pasarle la point cloud. Aunque
+  // tecnicamente deberian ser menos puntos
   MesherOctreeAdapter<OcTreeT>::Params params;
   params.occupied_logodds = octomap::logodds(0.97);
 
