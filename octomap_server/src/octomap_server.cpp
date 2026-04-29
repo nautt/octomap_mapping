@@ -77,6 +77,9 @@ OctomapServer::OctomapServer(const rclcpp::NodeOptions & node_options)
 
   mode = this->declare_parameter<std::string>("map_builder", "octomap");
   mesher_resolution_mode_ = this->declare_parameter<std::string>("mesher_resolution_mode", "dynamic");
+  mesher_refinement_mode_ = this->declare_parameter<std::string>("mesher_refinement_mode", "uniform");
+  cube_region_size_ = this->declare_parameter<double>("cube_region_size", 2.0);
+  coarse_rl_offset_ = this->declare_parameter<int>("coarse_rl_offset", 2);
 
   RCLCPP_INFO(get_logger(), "map_builder: %s", mode.c_str());
 
@@ -103,10 +106,14 @@ OctomapServer::OctomapServer(const rclcpp::NodeOptions & node_options)
       {
         const auto * tree = dynamic_cast<const octomap::OcTree *>(octree_.get());
         if (tree && tree->size() > 0) {
-          octomap_server::MetricsLogger::computeNativeOnly(tree, "metrics_octomap_incremental.json");
-          RCLCPP_INFO(get_logger(), "Native metrics saved to metrics.json");
+          ++native_snapshot_idx_;
+          std::string path = "metrics_octomap_native_s" +
+            std::to_string(scan_count_) + "_snap" +
+            std::to_string(native_snapshot_idx_) + ".json";
+          octomap_server::MetricsLogger::computeNativeOnly(tree, scan_count_, path);
+          RCLCPP_INFO(get_logger(), "Métricas nativas guardadas en %s", path.c_str());
         } else {
-          RCLCPP_WARN(get_logger(), "No native OcTree available for metrics");
+          RCLCPP_WARN(get_logger(), "No hay OcTree nativo disponible para métricas");
         }
       });
     RCLCPP_INFO(get_logger(), "OctomapServer running in OCTOMAP_NATIVE mode.");
@@ -579,6 +586,7 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
   const auto & t = sensor_to_world_transform_stamped.transform.translation;
   tf2::Vector3 sensor_to_world_vec3{t.x, t.y, t.z};
   insertScan(sensor_to_world_vec3, pc_ground, pc_nonground);
+  ++scan_count_;
 
   double total_elapsed = (rclcpp::Clock{}.now() - start_time).seconds();
   RCLCPP_DEBUG(
@@ -665,7 +673,10 @@ void OctomapServer::runMesherPipeline()
     }) + res_ * 0.5;
 
     // rl minimo tal que el octante raiz (lado = res_*2^rl) cubra max_half en cada eje.
-    rl = static_cast<unsigned short>(std::ceil(std::log2(2.0 * max_half / res_)));
+    // Se multiplica max_half por 1.01 para compensar que bounds_half se divide por 1.01 mas abajo
+    // (necesario para que GridMesher produzca hojas de exactamente res_). Sin este factor, la grid
+    // encogida por /1.01 puede quedar ~1% mas pequeña que max_half, excluyendo puntos en el limite.
+    rl = static_cast<unsigned short>(std::ceil(std::log2(2.0 * max_half * 1.01 / res_)));
     rl = std::max((unsigned short)1, std::min(rl, (unsigned short)16));
 
     // Bounds cubicos centrados en el centro ajustado. El /1.01 compensa el step*=1.01 de GridMesher para que
@@ -680,12 +691,42 @@ void OctomapServer::runMesherPipeline()
   }
 
   list<Clobscode::RefinementRegion *> all_regions;
-  all_regions.push_back(new RefinementAllRegion(rl)); // No se usa refinamiento adaptativo, posible mejora.
-                                                      // Octantes muy densos y homogeneos no deberian requerir
-                                                      // mas refinamiento, ya que no es necesario capturar mas detalle.
-                                                      // Octantes poco densos o heterogeneos implican detalles por lo que
-                                                      // requieren una resulucion mas fina para capturar dichos detalles.
-                                                      // Usar refinement regions para refinamiento adaptativo
+  unsigned short coarse_rl = 0;
+
+  if (mesher_refinement_mode_ == "cube") {
+    // Refinamiento no-uniforme: zona fina alrededor del robot + fondo grueso.
+    // Demuestra la propiedad 1-irregular del mesher en las transiciones entre niveles.
+    coarse_rl = static_cast<unsigned short>(std::max(1, static_cast<int>(rl) - coarse_rl_offset_));
+
+    // Obtener posición del robot desde TF; si falla, usar centroide del bounding box.
+    double rx = (minPt.x + maxPt.x) / 2.0;
+    double ry = (minPt.y + maxPt.y) / 2.0;
+    double rz = (minPt.z + maxPt.z) / 2.0;
+    try {
+      auto tf = tf2_buffer_->lookupTransform(world_frame_id_, base_frame_id_, tf2::TimePointZero);
+      rx = tf.transform.translation.x;
+      ry = tf.transform.translation.y;
+      rz = tf.transform.translation.z;
+      RCLCPP_INFO(get_logger(),
+          "[runMesherPipeline] cube mode: robot at (%.2f,%.2f,%.2f) from TF", rx, ry, rz);
+    } catch (const tf2::TransformException & ex) {
+      RCLCPP_WARN(get_logger(),
+          "[runMesherPipeline] cube mode: TF unavailable (%s), using bbox centroid", ex.what());
+    }
+
+    double h = cube_region_size_ / 2.0;
+    Clobscode::Point3D cube_min(rx - h, ry - h, rz - h);
+    Clobscode::Point3D cube_max(rx + h, ry + h, rz + h);
+
+    all_regions.push_back(new RefinementAllRegion(coarse_rl));
+    all_regions.push_back(new Clobscode::RefinementCubeRegion(cube_min, cube_max, rl));
+
+    RCLCPP_INFO(get_logger(),
+        "[runMesherPipeline] cube mode: coarse_rl=%u (edge=%.3fm), fine_rl=%u (edge=%.3fm), cube_half=%.2fm",
+        coarse_rl, res_ * std::pow(2.0, rl - coarse_rl), rl, res_, h);
+  } else {
+    all_regions.push_back(new RefinementAllRegion(rl));
+  }
 
   RCLCPP_INFO(get_logger(), "Running mesher...");
 
@@ -708,7 +749,10 @@ void OctomapServer::runMesherPipeline()
     lean_octants, mesher.getMeshPoints(), point3d_cloud,
     res_, mesher_time_ms,
     nullptr,
-    "metrics_mesher.json");
+    "metrics_mesher.json",
+    mesher_resolution_mode_,
+    mesher_refinement_mode_,
+    coarse_rl);
 
   // Adaptar mesher a octomap::OcTree, este resulta ser redundante, puesto que la unica forma de visualizar
   // el octree del mesher en octomap sin un rediseño considerable tanto de octomap como del mesher es

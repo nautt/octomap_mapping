@@ -16,7 +16,10 @@ static void writeMesherSection(
   const std::vector<Clobscode::LeanOctant> & octants,
   const std::vector<Clobscode::MeshPoint> & mesh_points,
   const std::vector<Clobscode::Point3D> & cloud_points,
-  double mesher_time_ms)
+  double mesher_time_ms,
+  const std::string & resolution_mode,
+  const std::string & refinement_mode,
+  unsigned short coarse_rl)
 {
 
   size_t occupied_count = 0;
@@ -49,6 +52,11 @@ static void writeMesherSection(
   size_t memory_bytes = sizeof(Clobscode::LeanOctant) * octants.size();
 
   f << "  \"mesher\": {\n";
+  f << "    \"resolution_mode\": \"" << resolution_mode << "\",\n";
+  f << "    \"refinement_mode\": \"" << refinement_mode << "\",\n";
+  if (refinement_mode == "cube" && coarse_rl > 0) {
+    f << "    \"coarse_rl\": " << coarse_rl << ",\n";
+  }
   f << "    \"time_ms\": " << mesher_time_ms << ",\n";
   f << "    \"occupied_element_count\": " << occupied_count << ",\n";
   f << "    \"total_octant_count\": " << octants.size() << ",\n";
@@ -154,7 +162,8 @@ static void writeOctomapStructuralSection(
 }
 
 //Obtener metricas de octree nativo de octomap y escribirlas en .json
-static void writeOctomapNativeSection(std::ofstream & f, const octomap::OcTree * tree)
+static void writeOctomapNativeSection(
+  std::ofstream & f, const octomap::OcTree * tree, size_t scan_count)
 {
   size_t occupied_count = 0;
   size_t free_count = 0;
@@ -174,6 +183,7 @@ static void writeOctomapNativeSection(std::ofstream & f, const octomap::OcTree *
 
   f << "  \"octomap_native\": {\n";
   f << "    \"source\": \"accumulated_native_with_raycasting\",\n";
+  f << "    \"scan_count\": " << scan_count << ",\n";
   f << "    \"occupied_element_count\": " << occupied_count << ",\n";
   f << "    \"free_element_count\": " << free_count << ",\n";
   f << "    \"leaf_count\": " << tree->getNumLeafNodes() << ",\n";
@@ -196,7 +206,10 @@ void MetricsLogger::compute(
   double resolution,
   double mesher_time_ms,
   const octomap::OcTree * native_tree,
-  const std::string & output_path)
+  const std::string & output_path,
+  const std::string & resolution_mode,
+  const std::string & refinement_mode,
+  unsigned short coarse_rl)
 {
   bool has_native = native_tree != nullptr && native_tree->size() > 0;
 
@@ -213,12 +226,12 @@ void MetricsLogger::compute(
   bt_path += ".bt";
 
   f << "{\n";
-  writeMesherSection(f, octants, mesh_points, cloud_points, mesher_time_ms);
+  writeMesherSection(f, octants, mesh_points, cloud_points, mesher_time_ms, resolution_mode, refinement_mode, coarse_rl);
   f << ",\n";
   writeOctomapStructuralSection(f, cloud_points, resolution, bt_path);
   if (has_native) {
     f << ",\n";
-    writeOctomapNativeSection(f, native_tree);
+    writeOctomapNativeSection(f, native_tree, 0);
   }
   f << "\n}\n";
 }
@@ -226,6 +239,7 @@ void MetricsLogger::compute(
 //octomap nativo (raycast y origen)
 void MetricsLogger::computeNativeOnly(
   const octomap::OcTree * native_tree,
+  size_t scan_count,
   const std::string & output_path)
 {
   if (native_tree == nullptr || native_tree->size() == 0) {
@@ -246,7 +260,7 @@ void MetricsLogger::computeNativeOnly(
   const_cast<octomap::OcTree *>(native_tree)->writeBinary(bt_path);
 
   f << "{\n";
-  writeOctomapNativeSection(f, native_tree);
+  writeOctomapNativeSection(f, native_tree, scan_count);
   f << "\n}\n";
 }
 

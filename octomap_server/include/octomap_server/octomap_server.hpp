@@ -318,6 +318,9 @@ private:
   std::string mode;
   OctreeBuilderMode octree_builder_mode_;
   std::string mesher_resolution_mode_; // "dynamic" | "aligned"
+  std::string mesher_refinement_mode_; // "uniform" | "cube"
+  double cube_region_size_;            // full side of the fine cube [m]
+  int coarse_rl_offset_;               // rl - coarse_rl_offset_ = coarse refinement level in cube mode
   sensor_msgs::msg::PointCloud2 latest_cloud_;
   rclcpp::Time latest_cloud_stamp_;
   bool has_latest_pointcloud_;
@@ -327,6 +330,11 @@ private:
 
   // Servicio para guardar métricas del árbol nativo acumulado.
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr save_metrics_srv_;
+
+  // Número de nubes de puntos procesadas por insertCloudCallback (contador de scans en modo nativo).
+  size_t scan_count_ = 0;
+  // Número de veces que se ha llamado a save_native_metrics (usado para nombres de archivos de snapshots).
+  size_t native_snapshot_idx_ = 0;
 
   // Metodos para el mesher externo.
   bool buildExternalOctree(
