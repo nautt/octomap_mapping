@@ -321,7 +321,7 @@ private:
   std::string mesher_refinement_mode_; // "uniform" | "cube"
   double cube_region_size_;            // full side of the fine cube [m]
   int coarse_rl_offset_;               // rl - coarse_rl_offset_ = coarse refinement level in cube mode
-  sensor_msgs::msg::PointCloud2 latest_cloud_;
+  PCLPointCloud latest_cloud_;
   rclcpp::Time latest_cloud_stamp_;
   bool has_latest_pointcloud_;
 

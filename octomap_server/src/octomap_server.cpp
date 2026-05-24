@@ -454,6 +454,8 @@ bool OctomapServer::openFile(const std::string & filename)
 void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
 {
 
+  /*
+  
   if (octree_builder_mode_ == OctreeBuilderMode::MESHER_EXTERNAL) {
     //Lookup TF sensor -> world (igual que el modo nativo, para evitar desincronizar con nube de puntos)
     geometry_msgs::msg::TransformStamped sensor_to_world_tf;
@@ -498,6 +500,7 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
     has_latest_pointcloud_ = true;
     return;
   }
+  */
 
   //Timer para metricas
   const auto start_time = rclcpp::Clock{}.now();
@@ -583,6 +586,46 @@ void OctomapServer::insertCloudCallback(const PointCloud2::ConstSharedPtr cloud)
     pc_nonground.header = pc.header;
   }
 
+  // Modo Mesher
+  if (octree_builder_mode_ == OctreeBuilderMode::MESHER_EXTERNAL) {
+    if (filter_ground_plane_) {
+      RCLCPP_WARN_ONCE(
+        get_logger(),
+        "filter_ground_plane_ no está soportado en modo MESHER_EXTERNAL: la nube de puntos "
+        "puede estar en el frame incorrecto (base en lugar de world). "
+        "Desactiva filter_ground_plane_ para usar el modo Mesher.");
+    }
+
+    // Aplicar filtro de rango máximo en el frame del mundo.
+    // El filtro se aplica aquí (y no en insertScan) porque el modo Mesher no
+    // realiza ray-casting. Se calcula la distancia euclídea desde la posición
+    // del sensor en el frame del mundo, replicando exactamente el criterio
+    // que usa insertScan para descartar endpoints lejanos.
+    if (max_range_ > 0.0) {
+      const auto & t = sensor_to_world_transform_stamped.transform.translation;
+      PCLPointCloud pc_range;
+      pc_range.header = pc.header;
+      for (const auto & pt : pc) {
+        const double dx = pt.x - t.x, dy = pt.y - t.y, dz = pt.z - t.z;
+        if (std::sqrt(dx * dx + dy * dy + dz * dz) <= max_range_)
+          pc_range.push_back(pt);
+      }
+      pc = std::move(pc_range);
+    }
+
+    latest_cloud_ = pc;
+    latest_cloud_stamp_ = cloud->header.stamp;
+    has_latest_pointcloud_ = true;
+
+    double total_elapsed = (rclcpp::Clock{}.now() - start_time).seconds();
+    RCLCPP_DEBUG(
+      get_logger(),
+      "LatestPointCloud updated in OctomapServer done (%zu pts, %f sec)",
+      pc.size(), total_elapsed);
+    return;
+  }
+
+  // Modo Octomap
   const auto & t = sensor_to_world_transform_stamped.transform.translation;
   tf2::Vector3 sensor_to_world_vec3{t.x, t.y, t.z};
   insertScan(sensor_to_world_vec3, pc_ground, pc_nonground);
@@ -614,10 +657,8 @@ bool OctomapServer::buildExternalOctree(
 //Funcion unica para ejecutar el mesher y realizar pruebas
 void OctomapServer::runMesherPipeline()
 {
-
-  //convertir latest_cloud_ to PCL
-  PCLPointCloud pc;
-  pcl::fromROSMsg(latest_cloud_, pc);
+  //Rescatar nube de puntos
+  PCLPointCloud pc = latest_cloud_;
   
   //convertir PCL to Point3D (formato mesher)
   std::vector<Clobscode::Point3D> point3d_cloud;
