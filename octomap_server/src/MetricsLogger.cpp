@@ -16,6 +16,7 @@ static void writeMesherSection(
   const std::vector<Clobscode::LeanOctant> & octants,
   const std::vector<Clobscode::MeshPoint> & mesh_points,
   const std::vector<Clobscode::Point3D> & cloud_points,
+  double resolution,
   double mesher_time_ms,
   const std::string & resolution_mode,
   const std::string & refinement_mode,
@@ -49,7 +50,13 @@ static void writeMesherSection(
   }
 
   double coverage = cloud_points.empty() ? 0.0 : static_cast<double>(covered_indices.size()) / cloud_points.size();
+  // Footprint de la representacion nativa del Mesher, comparable a OctoMap::memoryUsage():
+  // octantes (elementos) + nodos de malla (geometria explicita almacenada de forma explicita,
+  // a diferencia de OctoMap que la deriva de la posicion en el arbol). Se excluye de forma
+  // deliberada el buffer transitorio de indices de la nube de entrada (contained_cloud_points),
+  // analogo a la nube de entrada que OctoMap tampoco contabiliza en memoryUsage().
   size_t memory_bytes = sizeof(Clobscode::LeanOctant) * octants.size();
+  memory_bytes += mesh_points.size() * sizeof(Clobscode::MeshPoint);
 
   f << "  \"mesher\": {\n";
   f << "    \"resolution_mode\": \"" << resolution_mode << "\",\n";
@@ -57,9 +64,9 @@ static void writeMesherSection(
   if (refinement_mode == "cube" && coarse_rl > 0) {
     f << "    \"coarse_rl\": " << coarse_rl << ",\n";
   }
+  f << "    \"resolution_m\": " << resolution << ",\n";
   f << "    \"time_ms\": " << mesher_time_ms << ",\n";
   f << "    \"occupied_element_count\": " << occupied_count << ",\n";
-  f << "    \"total_octant_count\": " << octants.size() << ",\n";
   f << "    \"memory_bytes\": " << memory_bytes << ",\n";
   f << "    \"point_coverage\": " << coverage << ",\n";
   f << "    \"depth_histogram\": [";
@@ -101,18 +108,15 @@ static void writeOctomapStructuralSection(
   double time_ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
 
   size_t occupied_count = 0;
-  size_t free_count = 0;
   std::vector<unsigned int> depth_hist(17, 0u);
 
   for (auto it = fresh_tree.begin_leafs(), end = fresh_tree.end_leafs(); it != end; ++it) {
-    unsigned depth = it.getDepth();
     if (fresh_tree.isNodeOccupied(*it)) {
       ++occupied_count;
-    } else {
-      ++free_count;
-    }
-    if (depth <= 16) {
-      depth_hist[depth]++;
+      unsigned depth = it.getDepth();
+      if (depth <= 16) {
+        depth_hist[depth]++;
+      }
     }
   }
 
@@ -129,32 +133,16 @@ static void writeOctomapStructuralSection(
   }
   double coverage = points.empty() ? 0.0 : static_cast<double>(covered) / points.size();
 
-  const unsigned int tree_depth = fresh_tree.getTreeDepth();
-  std::vector<double> depth_to_edge(17, 0.0);
-  for (unsigned int d = 0; d <= tree_depth; ++d) {
-    depth_to_edge[d] = fresh_tree.getNodeSize(d);
-  }
-
   fresh_tree.writeBinary(bt_path);
 
   f << "  \"octomap_snapshot\": {\n";
-  f << "    \"source\": \"fresh_single_scan_no_raycasting\",\n";
   f << "    \"time_ms\": " << time_ms << ",\n";
   f << "    \"occupied_element_count\": " << occupied_count << ",\n";
-  f << "    \"free_element_count\": " << free_count << ",\n";
-  f << "    \"leaf_count\": " << fresh_tree.getNumLeafNodes() << ",\n";
-  f << "    \"total_node_count\": " << fresh_tree.size() << ",\n";
   f << "    \"memory_bytes\": " << fresh_tree.memoryUsage() << ",\n";
   f << "    \"point_coverage\": " << coverage << ",\n";
   f << "    \"depth_histogram\": [";
   for (int i = 0; i < 17; ++i) {
     f << depth_hist[i];
-    if (i < 16) {f << ",";}
-  }
-  f << "],\n";
-  f << "    \"depth_to_edge_m\": [";
-  for (int i = 0; i < 17; ++i) {
-    f << depth_to_edge[i];
     if (i < 16) {f << ",";}
   }
   f << "]\n";
@@ -186,8 +174,6 @@ static void writeOctomapNativeSection(
   f << "    \"scan_count\": " << scan_count << ",\n";
   f << "    \"occupied_element_count\": " << occupied_count << ",\n";
   f << "    \"free_element_count\": " << free_count << ",\n";
-  f << "    \"leaf_count\": " << tree->getNumLeafNodes() << ",\n";
-  f << "    \"total_node_count\": " << tree->size() << ",\n";
   f << "    \"memory_bytes\": " << tree->memoryUsage() << ",\n";
   f << "    \"depth_histogram\": [";
   for (int i = 0; i < 17; ++i) {
@@ -226,7 +212,7 @@ void MetricsLogger::compute(
   bt_path += ".bt";
 
   f << "{\n";
-  writeMesherSection(f, octants, mesh_points, cloud_points, mesher_time_ms, resolution_mode, refinement_mode, coarse_rl);
+  writeMesherSection(f, octants, mesh_points, cloud_points, resolution, mesher_time_ms, resolution_mode, refinement_mode, coarse_rl);
   f << ",\n";
   writeOctomapStructuralSection(f, cloud_points, resolution, bt_path);
   if (has_native) {
